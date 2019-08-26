@@ -158,7 +158,7 @@ list_qtdSetores = [4]
 list_area = [100]
 
 total_simulacoes = 33
-framesSimulacao = []
+roundsSimulacao = []
 arquivo = open('novo-arquivo.txt', 'w')
 arquivo_bat = open('bateria.txt', 'w')
 
@@ -186,18 +186,18 @@ print("\n\nCENÁRIO: " + str(qtdNodes) + ' nodes, '
 for modoOp in modosHop:
     intraCluster = modoOp[0]
     interCluster = modoOp[1]
-    
-    modo = '>>>>>>>>>>>>>>>>>>>> Intracluster ' + str(intraCluster) + '|| Intercluster ' + str(interCluster) + '<<<<<<<<<<<<<<<<<<<<<\n'
+
+    modo = '>>>>>>>>>>>>>>>>>>>> Intracluster ' + str(intraCluster) + ' || Intercluster ' + str(interCluster) + '<<<<<<<<<<<<<<<<<<<<<\n'
     arquivo.write(modo)
 
     framesSimulacao = []
-    
+
     nosVivos = list()
 
     # Iteração para realizar várias iterações (total de simulações)
     for simulacao in range(total_simulacoes):
         Round = 1
-        totalFrames = 0
+        totalRounds = 0
         nodes = gerarCenario(qtdNodes,distMax)
 
         if(interCluster == 1):
@@ -216,15 +216,15 @@ for modoOp in modosHop:
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 5000 and len(nodes) != 0):
-            
+
             #arquivo_bat.write('>>>>>> Round ' + str(Round) + ' <<<<<<<\n')
-            
+
             # Energy Harvesting
             for n in nodes:
                 harvest(n[1], Round)
                 bateria = 'Nó ' + str(n[0]) + ': ' + str(n[1]) + '\n'
                 #arquivo_bat.write(bateria)
-                
+
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):
                 for k in nodes:
@@ -395,7 +395,7 @@ for modoOp in modosHop:
 
                 #Exclui zerados
                 checaBateria(nodes)
-                
+
                 nosVivos.append(len(nodes))
                 #resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
                 #arquivo.write(resultados)
@@ -403,24 +403,24 @@ for modoOp in modosHop:
                 CH = []
                 Round = Round + 1
                 if(nodes != []):
-                    totalFrames += totalFramesExecutados                   
-                
+                    totalRounds += Round
+
 
                 # FIM DE UM ROUND ##########
         df = pd.DataFrame(nosVivos, columns=['NosVivos'])
         #print('Simulacao ' + str(simulacao+1) + ": " + str(totalFrames))
-        framesSimulacao.append(totalFrames)
+        roundsSimulacao.append(Round)
 
-        resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
+        resultados = 'Simulacao: ' + str(simulacao) + ' Rounds: ' + str(Round) + '\n'
         arquivo.write(resultados)
 
         # FIM DE UMA SIMULAÇÃO ##########
-    ############################### Estatísticas ################################
-    media = sum(framesSimulacao) / total_simulacoes
+#    ############################### Estatísticas ################################
+#    media = totalRounds / total_simulacoes
 
-    print('\nResultado do ' + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:")
-    print('Média: ' + str(media))
-    print('Erro: ' + str(1.96*(desvio_padrao(framesSimulacao, media) / math.sqrt(total_simulacoes) )))
+#    print('\nResultado do ' + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:")
+#    print('Média: ' + str(media))
+#    print('Erro: ' + str(1.96*(desvio_padrao(totalRounds, media) / math.sqrt(total_simulacoes) )))
 
     # FIM DE TODOS OS EXPERIMENTOS DE UM MODO DE OPERAÇÃO ##########
 
