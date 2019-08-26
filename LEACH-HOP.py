@@ -3,6 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from energySource import harvest
 
 ############################### Geração de Redes ################################
 def gerarCenario(qtdNodes,distMax):
@@ -147,17 +148,19 @@ def desvio_padrao(valores, media):
 CH = []
 tamPacoteConfig = 300
 
-modosHop = [[0,0], [0,1], [1,0], [1,1]]
+modosHop = [[0,0],[0,1],[1,0],[1,1]]
 
 list_qtdNodes = [100]
-list_qtdFrames = [10]
+list_qtdFrames = [1]
 list_tamPacoteTransmissao = [2000]
 list_percentualCH = [0.05]
 list_qtdSetores = [4]
 list_area = [100]
 
-total_simulacoes = 1
+total_simulacoes = 33
 framesSimulacao = []
+arquivo = open('novo-arquivo.txt', 'w')
+arquivo_bat = open('bateria.txt', 'w')
 
 ############################### Main ################################
 # Realiza a variação de um dos cenários (Quem usar a variável: cenario)
@@ -183,6 +186,9 @@ print("\n\nCENÁRIO: " + str(qtdNodes) + ' nodes, '
 for modoOp in modosHop:
     intraCluster = modoOp[0]
     interCluster = modoOp[1]
+    
+    modo = '>>>>>>>>>>>>>>>>>>>> Intracluster ' + str(intraCluster) + '|| Intercluster ' + str(interCluster) + '<<<<<<<<<<<<<<<<<<<<<\n'
+    arquivo.write(modo)
 
     framesSimulacao = []
     
@@ -211,9 +217,13 @@ for modoOp in modosHop:
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 5000 and len(nodes) != 0):
             
+            #arquivo_bat.write('>>>>>> Round ' + str(Round) + ' <<<<<<<\n')
+            
             # Energy Harvesting
             for n in nodes:
-                n[1]+=0.0000001694
+                harvest(n[1], Round)
+                bateria = 'Nó ' + str(n[0]) + ': ' + str(n[1]) + '\n'
+                #arquivo_bat.write(bateria)
                 
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):
@@ -387,7 +397,8 @@ for modoOp in modosHop:
                 checaBateria(nodes)
                 
                 nosVivos.append(len(nodes))
-                #print('#Nós Vivos:', len(nodes), 'Round:', Round)
+                #resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
+                #arquivo.write(resultados)
 
                 CH = []
                 Round = Round + 1
@@ -397,9 +408,24 @@ for modoOp in modosHop:
 
                 # FIM DE UM ROUND ##########
         df = pd.DataFrame(nosVivos, columns=['NosVivos'])
-        print('Simulacao ' + str(simulacao+1) + ": " + str(totalFrames))
+        #print('Simulacao ' + str(simulacao+1) + ": " + str(totalFrames))
         framesSimulacao.append(totalFrames)
 
+        resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
+        arquivo.write(resultados)
+
         # FIM DE UMA SIMULAÇÃO ##########
+    ############################### Estatísticas ################################
+    media = sum(framesSimulacao) / total_simulacoes
+
+    print('\nResultado do ' + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:")
+    print('Média: ' + str(media))
+    print('Erro: ' + str(1.96*(desvio_padrao(framesSimulacao, media) / math.sqrt(total_simulacoes) )))
+
+    # FIM DE TODOS OS EXPERIMENTOS DE UM MODO DE OPERAÇÃO ##########
 
 plt.plot(df.index, df['NosVivos'])
+print("Last round:", max(df.index))
+
+arquivo.close()
+arquivo_bat.close()
