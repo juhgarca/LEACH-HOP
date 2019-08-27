@@ -24,8 +24,8 @@ def selecao_CH(nodes, Round, Porcentagem):
 CH = []
 tamPacoteConfig = 300
 
-modosHop = [[0,0],[0,1],[1,0],[1,1]]
-#modosHop = [[0,0]]
+#modosHop = [[0,0],[0,1],[1,0],[1,1]]
+modosHop = [[0,0]]
 
 list_qtdNodes = [100]
 list_qtdFrames = [10]
@@ -99,7 +99,7 @@ for modoOp in modosHop:
             for n in nodes:
                 n[1] += harvest(Round)
                 bateria = 'Nó ' + str(n[0]) + ': ' + str(n[1]) + '\n'
-                #arquivo_bat.write(bateria)
+                arquivo_bat.write(bateria)
 
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):
@@ -281,10 +281,10 @@ for modoOp in modosHop:
 
 
                 # FIM DE UM ROUND ##########
-                
+
         df = pd.DataFrame(nosVivos, columns=['NosVivos'])
         #print('Simulacao ' + str(simulacao+1) + ": " + str(totalFrames))
-        roundsSimulacao.append(Round)
+        roundsSimulacao.append(Round-1)
 
         resultados = 'Simulacao: ' + str(simulacao) + ' Rounds: ' + str(Round-1) + ' Nos Vivos: ' + str(len(nodes)) + '\n'
         arquivo.write(resultados)
