@@ -10,7 +10,8 @@ import config as c
 df = pd.read_csv('trace_days.txt')
 
 
-def harvest(bateria, Round):
-    d = c.cell_size * c.cell_efic * (df['energia'][Round] * 10**-6) * 20
+def harvest(Round):
+    d = c.cell_size * c.cell_efic * df['energia'][Round] * c.round_len
     #d = c.cell_size * c.cell_efic * df['energia'][Round] * 20
-    bateria += d
+    print(d)
+    return d

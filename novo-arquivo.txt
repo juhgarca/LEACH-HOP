@@ -1,115 +1,136 @@
->>>>>>>>>>>>>>>>>>>> Intracluster 0 || Intercluster 0<<<<<<<<<<<<<<<<<<<<<
-Simulacao: 0 Rounds: 1013
-Simulacao: 1 Rounds: 913
-Simulacao: 2 Rounds: 906
-Simulacao: 3 Rounds: 960
-Simulacao: 4 Rounds: 972
-Simulacao: 5 Rounds: 933
-Simulacao: 6 Rounds: 929
-Simulacao: 7 Rounds: 1017
-Simulacao: 8 Rounds: 1002
-Simulacao: 9 Rounds: 950
-Simulacao: 10 Rounds: 979
-Simulacao: 11 Rounds: 1008
-Simulacao: 12 Rounds: 971
-Simulacao: 13 Rounds: 945
-Simulacao: 14 Rounds: 954
-Simulacao: 15 Rounds: 959
-Simulacao: 16 Rounds: 962
-Simulacao: 17 Rounds: 980
-Simulacao: 18 Rounds: 979
-Simulacao: 19 Rounds: 986
-Simulacao: 20 Rounds: 999
-Simulacao: 21 Rounds: 938
-Simulacao: 22 Rounds: 896
-Simulacao: 23 Rounds: 1041
-Simulacao: 24 Rounds: 1004
-Simulacao: 25 Rounds: 936
-Simulacao: 26 Rounds: 908
-Simulacao: 27 Rounds: 956
-Simulacao: 28 Rounds: 967
-Simulacao: 29 Rounds: 944
-Simulacao: 30 Rounds: 941
-Simulacao: 31 Rounds: 937
-Simulacao: 32 Rounds: 937
->>>>>>>>>>>>>>>>>>>> Intracluster 0 || Intercluster 1<<<<<<<<<<<<<<<<<<<<<
-Simulacao: 0 Rounds: 940
-Simulacao: 1 Rounds: 942
-Simulacao: 2 Rounds: 942
-Simulacao: 3 Rounds: 911
-Simulacao: 4 Rounds: 966
-Simulacao: 5 Rounds: 1017
-Simulacao: 6 Rounds: 958
-Simulacao: 7 Rounds: 962
-Simulacao: 8 Rounds: 993
-Simulacao: 9 Rounds: 999
-Simulacao: 10 Rounds: 916
-Simulacao: 11 Rounds: 932
-Simulacao: 12 Rounds: 888
-Simulacao: 13 Rounds: 858
-Simulacao: 14 Rounds: 906
-Simulacao: 15 Rounds: 961
-Simulacao: 16 Rounds: 951
-Simulacao: 17 Rounds: 938
-Simulacao: 18 Rounds: 920
-Simulacao: 19 Rounds: 888
-Simulacao: 20 Rounds: 1009
-Simulacao: 21 Rounds: 951
-Simulacao: 22 Rounds: 966
-Simulacao: 23 Rounds: 936
-Simulacao: 24 Rounds: 975
-Simulacao: 25 Rounds: 944
-Simulacao: 26 Rounds: 917
-Simulacao: 27 Rounds: 987
-Simulacao: 28 Rounds: 957
-Simulacao: 29 Rounds: 952
-Simulacao: 30 Rounds: 990
-Simulacao: 31 Rounds: 951
-Simulacao: 32 Rounds: 991
->>>>>>>>>>>>>>>>>>>> Intracluster 1 || Intercluster 0<<<<<<<<<<<<<<<<<<<<<
-Simulacao: 0 Rounds: 1279
-Simulacao: 1 Rounds: 1436
-Simulacao: 2 Rounds: 1485
-Simulacao: 3 Rounds: 1400
-Simulacao: 4 Rounds: 1384
-Simulacao: 5 Rounds: 1428
-Simulacao: 6 Rounds: 1443
-Simulacao: 7 Rounds: 1331
-Simulacao: 8 Rounds: 1383
-Simulacao: 9 Rounds: 1397
-Simulacao: 10 Rounds: 1432
-Simulacao: 11 Rounds: 1409
-Simulacao: 12 Rounds: 1362
-Simulacao: 13 Rounds: 1454
-Simulacao: 14 Rounds: 1414
-Simulacao: 15 Rounds: 1346
-Simulacao: 16 Rounds: 1329
-Simulacao: 17 Rounds: 1379
-Simulacao: 18 Rounds: 1360
-Simulacao: 19 Rounds: 1417
-Simulacao: 20 Rounds: 1427
-Simulacao: 21 Rounds: 1415
-Simulacao: 22 Rounds: 1467
-Simulacao: 23 Rounds: 1334
-Simulacao: 24 Rounds: 1406
-Simulacao: 25 Rounds: 1415
-Simulacao: 26 Rounds: 1382
-Simulacao: 27 Rounds: 1364
-Simulacao: 28 Rounds: 1413
-Simulacao: 29 Rounds: 1477
-Simulacao: 30 Rounds: 1352
-Simulacao: 31 Rounds: 1418
-Simulacao: 32 Rounds: 1446
->>>>>>>>>>>>>>>>>>>> Intracluster 1 || Intercluster 1<<<<<<<<<<<<<<<<<<<<<
-Simulacao: 0 Rounds: 1238
-Simulacao: 1 Rounds: 1255
-Simulacao: 2 Rounds: 1304
-Simulacao: 3 Rounds: 1294
-Simulacao: 4 Rounds: 1246
-Simulacao: 5 Rounds: 1339
-Simulacao: 6 Rounds: 1273
-Simulacao: 7 Rounds: 1341
-Simulacao: 8 Rounds: 1279
-Simulacao: 9 Rounds: 1238
-Simulacao: 10 Rounds: 1282
-Simulacao: 11 Rounds: 1260
+>>>>>>>>>>>>>>>>>>>> Intracluster 0 || Intercluster 0 <<<<<<<<<<<<<<<<<<<<<
+Simulacao: 0 Rounds: 125 Nos Vivos: 0
+Simulacao: 1 Rounds: 132 Nos Vivos: 0
+Simulacao: 2 Rounds: 126 Nos Vivos: 0
+Simulacao: 3 Rounds: 134 Nos Vivos: 0
+Simulacao: 4 Rounds: 151 Nos Vivos: 0
+Simulacao: 5 Rounds: 147 Nos Vivos: 0
+Simulacao: 6 Rounds: 138 Nos Vivos: 0
+Simulacao: 7 Rounds: 125 Nos Vivos: 0
+Simulacao: 8 Rounds: 136 Nos Vivos: 0
+Simulacao: 9 Rounds: 225 Nos Vivos: 0
+Simulacao: 10 Rounds: 128 Nos Vivos: 0
+Simulacao: 11 Rounds: 178 Nos Vivos: 0
+Simulacao: 12 Rounds: 126 Nos Vivos: 0
+Simulacao: 13 Rounds: 142 Nos Vivos: 0
+Simulacao: 14 Rounds: 174 Nos Vivos: 0
+Simulacao: 15 Rounds: 128 Nos Vivos: 0
+Simulacao: 16 Rounds: 139 Nos Vivos: 0
+Simulacao: 17 Rounds: 128 Nos Vivos: 0
+Simulacao: 18 Rounds: 154 Nos Vivos: 0
+Simulacao: 19 Rounds: 136 Nos Vivos: 0
+Simulacao: 20 Rounds: 128 Nos Vivos: 0
+Simulacao: 21 Rounds: 128 Nos Vivos: 0
+Simulacao: 22 Rounds: 144 Nos Vivos: 0
+Simulacao: 23 Rounds: 154 Nos Vivos: 0
+Simulacao: 24 Rounds: 174 Nos Vivos: 0
+Simulacao: 25 Rounds: 151 Nos Vivos: 0
+Simulacao: 26 Rounds: 195 Nos Vivos: 0
+Simulacao: 27 Rounds: 128 Nos Vivos: 0
+Simulacao: 28 Rounds: 136 Nos Vivos: 0
+Simulacao: 29 Rounds: 140 Nos Vivos: 0
+Simulacao: 30 Rounds: 153 Nos Vivos: 0
+Simulacao: 31 Rounds: 204 Nos Vivos: 0
+Simulacao: 32 Rounds: 140 Nos Vivos: 0
+>>>>>>>>>>>>>>>>>>>> Intracluster 0 || Intercluster 1 <<<<<<<<<<<<<<<<<<<<<
+Simulacao: 0 Rounds: 172 Nos Vivos: 0
+Simulacao: 1 Rounds: 201 Nos Vivos: 0
+Simulacao: 2 Rounds: 221 Nos Vivos: 0
+Simulacao: 3 Rounds: 201 Nos Vivos: 0
+Simulacao: 4 Rounds: 175 Nos Vivos: 0
+Simulacao: 5 Rounds: 196 Nos Vivos: 0
+Simulacao: 6 Rounds: 177 Nos Vivos: 0
+Simulacao: 7 Rounds: 146 Nos Vivos: 0
+Simulacao: 8 Rounds: 196 Nos Vivos: 0
+Simulacao: 9 Rounds: 168 Nos Vivos: 0
+Simulacao: 10 Rounds: 148 Nos Vivos: 0
+Simulacao: 11 Rounds: 159 Nos Vivos: 0
+Simulacao: 12 Rounds: 140 Nos Vivos: 0
+Simulacao: 13 Rounds: 158 Nos Vivos: 0
+Simulacao: 14 Rounds: 176 Nos Vivos: 0
+Simulacao: 15 Rounds: 177 Nos Vivos: 0
+Simulacao: 16 Rounds: 240 Nos Vivos: 0
+Simulacao: 17 Rounds: 127 Nos Vivos: 0
+Simulacao: 18 Rounds: 149 Nos Vivos: 0
+Simulacao: 19 Rounds: 213 Nos Vivos: 0
+Simulacao: 20 Rounds: 180 Nos Vivos: 0
+Simulacao: 21 Rounds: 205 Nos Vivos: 0
+Simulacao: 22 Rounds: 159 Nos Vivos: 0
+Simulacao: 23 Rounds: 136 Nos Vivos: 0
+Simulacao: 24 Rounds: 127 Nos Vivos: 0
+Simulacao: 25 Rounds: 152 Nos Vivos: 0
+Simulacao: 26 Rounds: 113 Nos Vivos: 0
+Simulacao: 27 Rounds: 135 Nos Vivos: 0
+Simulacao: 28 Rounds: 184 Nos Vivos: 0
+Simulacao: 29 Rounds: 155 Nos Vivos: 0
+Simulacao: 30 Rounds: 163 Nos Vivos: 0
+Simulacao: 31 Rounds: 130 Nos Vivos: 0
+Simulacao: 32 Rounds: 133 Nos Vivos: 0
+>>>>>>>>>>>>>>>>>>>> Intracluster 1 || Intercluster 0 <<<<<<<<<<<<<<<<<<<<<
+Simulacao: 0 Rounds: 220 Nos Vivos: 0
+Simulacao: 1 Rounds: 220 Nos Vivos: 0
+Simulacao: 2 Rounds: 208 Nos Vivos: 0
+Simulacao: 3 Rounds: 235 Nos Vivos: 0
+Simulacao: 4 Rounds: 261 Nos Vivos: 0
+Simulacao: 5 Rounds: 210 Nos Vivos: 0
+Simulacao: 6 Rounds: 203 Nos Vivos: 0
+Simulacao: 7 Rounds: 243 Nos Vivos: 0
+Simulacao: 8 Rounds: 235 Nos Vivos: 0
+Simulacao: 9 Rounds: 277 Nos Vivos: 0
+Simulacao: 10 Rounds: 222 Nos Vivos: 0
+Simulacao: 11 Rounds: 215 Nos Vivos: 0
+Simulacao: 12 Rounds: 219 Nos Vivos: 0
+Simulacao: 13 Rounds: 212 Nos Vivos: 0
+Simulacao: 14 Rounds: 258 Nos Vivos: 0
+Simulacao: 15 Rounds: 309 Nos Vivos: 0
+Simulacao: 16 Rounds: 227 Nos Vivos: 0
+Simulacao: 17 Rounds: 270 Nos Vivos: 0
+Simulacao: 18 Rounds: 212 Nos Vivos: 0
+Simulacao: 19 Rounds: 315 Nos Vivos: 0
+Simulacao: 20 Rounds: 316 Nos Vivos: 0
+Simulacao: 21 Rounds: 210 Nos Vivos: 0
+Simulacao: 22 Rounds: 234 Nos Vivos: 0
+Simulacao: 23 Rounds: 279 Nos Vivos: 0
+Simulacao: 24 Rounds: 235 Nos Vivos: 0
+Simulacao: 25 Rounds: 269 Nos Vivos: 0
+Simulacao: 26 Rounds: 282 Nos Vivos: 0
+Simulacao: 27 Rounds: 238 Nos Vivos: 0
+Simulacao: 28 Rounds: 271 Nos Vivos: 0
+Simulacao: 29 Rounds: 246 Nos Vivos: 0
+Simulacao: 30 Rounds: 250 Nos Vivos: 0
+Simulacao: 31 Rounds: 277 Nos Vivos: 0
+Simulacao: 32 Rounds: 269 Nos Vivos: 0
+>>>>>>>>>>>>>>>>>>>> Intracluster 1 || Intercluster 1 <<<<<<<<<<<<<<<<<<<<<
+Simulacao: 0 Rounds: 216 Nos Vivos: 0
+Simulacao: 1 Rounds: 220 Nos Vivos: 0
+Simulacao: 2 Rounds: 240 Nos Vivos: 0
+Simulacao: 3 Rounds: 194 Nos Vivos: 0
+Simulacao: 4 Rounds: 273 Nos Vivos: 0
+Simulacao: 5 Rounds: 218 Nos Vivos: 0
+Simulacao: 6 Rounds: 188 Nos Vivos: 0
+Simulacao: 7 Rounds: 187 Nos Vivos: 0
+Simulacao: 8 Rounds: 185 Nos Vivos: 0
+Simulacao: 9 Rounds: 184 Nos Vivos: 0
+Simulacao: 10 Rounds: 250 Nos Vivos: 0
+Simulacao: 11 Rounds: 233 Nos Vivos: 0
+Simulacao: 12 Rounds: 249 Nos Vivos: 0
+Simulacao: 13 Rounds: 229 Nos Vivos: 0
+Simulacao: 14 Rounds: 237 Nos Vivos: 0
+Simulacao: 15 Rounds: 229 Nos Vivos: 0
+Simulacao: 16 Rounds: 210 Nos Vivos: 0
+Simulacao: 17 Rounds: 187 Nos Vivos: 0
+Simulacao: 18 Rounds: 193 Nos Vivos: 0
+Simulacao: 19 Rounds: 195 Nos Vivos: 0
+Simulacao: 20 Rounds: 204 Nos Vivos: 0
+Simulacao: 21 Rounds: 209 Nos Vivos: 0
+Simulacao: 22 Rounds: 207 Nos Vivos: 0
+Simulacao: 23 Rounds: 196 Nos Vivos: 0
+Simulacao: 24 Rounds: 207 Nos Vivos: 0
+Simulacao: 25 Rounds: 187 Nos Vivos: 0
+Simulacao: 26 Rounds: 190 Nos Vivos: 0
+Simulacao: 27 Rounds: 200 Nos Vivos: 0
+Simulacao: 28 Rounds: 198 Nos Vivos: 0
+Simulacao: 29 Rounds: 220 Nos Vivos: 0
+Simulacao: 30 Rounds: 215 Nos Vivos: 0
+Simulacao: 31 Rounds: 182 Nos Vivos: 0
+Simulacao: 32 Rounds: 230 Nos Vivos: 0

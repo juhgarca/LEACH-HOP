@@ -27,5 +27,5 @@ area =                                 list_area[0]
 # [gorlatova2012networking]
 cell_size = 10      # cm^2
 cell_efic = 0.01
-round_len = 50      # segundos
+round_len = 20      # segundos
 

@@ -5,9 +5,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from energySource import harvest
-from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
+from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, maiorLista, menorLista, setorizacao, setorizacaoCH, verifica_eleitos
 
 
+############################### Functions ################################
 def selecao_CH(nodes, Round, Porcentagem):
   CH = []
   for k in nodes:
@@ -18,6 +19,7 @@ def selecao_CH(nodes, Round, Porcentagem):
       CH.append(k)
       nodes.remove(k)
   return CH
+
 
 
 ############################### Variables ################################
@@ -97,7 +99,7 @@ for modoOp in modosHop:
 
             # Energy Harvesting
             for n in nodes:
-                n[1] += harvest(Round)
+                harvest(n[1], Round)
                 bateria = 'Nó ' + str(n[0]) + ': ' + str(n[1]) + '\n'
                 #arquivo_bat.write(bateria)
 
@@ -273,8 +275,6 @@ for modoOp in modosHop:
                 checaBateria(nodes)
 
                 nosVivos.append(len(nodes))
-                #resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
-                #arquivo.write(resultados)
 
                 CH = []
                 Round = Round + 1
@@ -303,5 +303,4 @@ for modoOp in modosHop:
 #plt.plot(df.index, df['NosVivos'])
 #print("Last round:", max(df.index))
 
-arquivo.close()
-arquivo_bat.close()
+
