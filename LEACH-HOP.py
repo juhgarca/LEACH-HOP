@@ -4,7 +4,7 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from energySource import harvest
+from energySource import irradiacao, harvest
 from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
 
 
@@ -24,8 +24,8 @@ def selecao_CH(nodes, Round, Porcentagem):
 CH = []
 tamPacoteConfig = 300
 
-#modosHop = [[0,0],[0,1],[1,0],[1,1]]
-modosHop = [[0,0]]
+modosHop = [[0,0],[0,1],[1,0],[1,1]]
+#modosHop = [[0,0]]
 
 list_qtdNodes = [100]
 list_qtdFrames = [10]
@@ -93,13 +93,17 @@ for modoOp in modosHop:
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 5000 and len(nodes) != 0):
 
+            #Round += 1
             #arquivo_bat.write('>>>>>> Round ' + str(Round) + ' <<<<<<<\n')
 
-            # Energy Harvesting
-            for n in nodes:
-                n[1] += harvest(Round)
-                bateria = 'Nó ' + str(n[0]) + ': ' + str(n[1]) + '\n'
-                arquivo_bat.write(bateria)
+# =============================================================================
+#             # Energy Harvesting
+#             H = irradiacao(Round)
+#             for n in nodes:
+#                 n[1] += harvest(H)
+#                 if n[1] >= 5.0:
+#                     n[1] = 5.0
+# =============================================================================
 
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):
@@ -274,6 +278,7 @@ for modoOp in modosHop:
 
                 nosVivos.append(len(nodes))
                 #resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
+                #print('Simulação: ' + str(simulacao) + ' Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n')
                 #arquivo.write(resultados)
 
                 CH = []

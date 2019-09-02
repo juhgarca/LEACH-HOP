@@ -9,51 +9,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-setupF = pd.read_csv('setupF.txt', delimiter='\t', low_memory=False)
-setupF.columns = ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
+setupC = pd.read_csv('setupC.txt', delimiter='\t', low_memory=False)
+setupC.columns = ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
 
-print(setupF.shape)
+print(setupC.shape)
 
-setupF = setupF[setupF.b != '        NaN']
+setupC = setupC[setupC.b != '        NaN']         # setupC: '     NaN', nos demais: '        NaN'
 
-print(setupF.shape)
+print(setupC.shape)
 
 # Mês
-#energia = np.array(setupF['b'][(setupF["c"]==2009) & (setupF["d"]==11)])
+#energia = np.array(setupC['b'][(setupC["c"]==2009) & (setupC["d"]==11)])
 
-#Dia
-energia = np.array(setupF['b'][(setupF["c"]==2010) & (setupF["d"]==3) & (setupF["e"]==16)])
+# 24h
+#energia = np.array(setupC['b'][(setupC["c"]==2010) & (setupC["d"]==3) & (setupC["e"]==16)])
 
-print("Min:", min(setupF['b']))
-print("Max:", max(setupF['b']))
-# =============================================================================
-# 
-# #Dia
-# energia = np.array(setupF['b'][(setupF["c"]==2009) & (setupF["d"]==8) & (setupF["e"]==15)])
-# energia2 = np.array(setupF['b'][(setupF["c"]==2009) & (setupF["d"]==8) & (setupF["e"]==16)])
-# energia3 = np.array(setupF['b'][(setupF["c"]==2009) & (setupF["d"]==8) & (setupF["e"]==17)])
-# energia4 = np.array(setupF['b'][(setupF["c"]==2009) & (setupF["d"]==8) & (setupF["e"]==18)])
-# 
-# 
-# #print(energia)
-# 
-# with open('trace_setupF_mes.txt', 'w') as file:
-#     for i in range(1, len(energia)):
-#         file.write("{}\n".format(energia[i].strip(" ")))
-#     for i in range(1, len(energia2)):
-#         file.write("{}\n".format(energia2[i].strip(" ")))
-#     for i in range(1, len(energia3)):
-#         file.write("{}\n".format(energia3[i].strip(" ")))
-#     for i in range(1, len(energia4)):
-#         file.write("{}\n".format(energia4[i].strip(" ")))
-# 
-# 
-# =============================================================================
-with open('trace_setupF_24h.txt', 'w') as file:
-     for i in range(1, len(energia)):
+# 48h
+energia = np.array(setupC['b'][(setupC["c"]==2010) & (setupC["d"]==3) & (setupC["e"]==16)])
+energia2 = np.array(setupC['b'][(setupC["c"]==2010) & (setupC["d"]==3) & (setupC["e"]==17)])
+
+
+print("Min:", min(setupC['b']))
+print("Max:", max(setupC['b']))
+with open('trace_setupC_48h.txt', 'w') as file:
+    for i in range(1, len(energia)):
+         file.write("{}\n".format(energia[i].strip(" ")))
+    for i in range(1, len(energia2)):
          file.write("{}\n".format(energia[i].strip(" ")))
 
-#plt.plot(range(len(energia_setupF)), energia_setupF)
+#plt.plot(range(len(energia_setupC)), energia_setupC)
 
 
 
