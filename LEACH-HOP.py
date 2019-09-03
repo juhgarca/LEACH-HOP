@@ -63,9 +63,6 @@ for modoOp in modosHop:
     intraCluster = modoOp[0]
     interCluster = modoOp[1]
 
-    modo = '>>>>>>>>>>>>>>>>>>>> Intracluster ' + str(intraCluster) + ' || Intercluster ' + str(interCluster) + ' <<<<<<<<<<<<<<<<<<<<<\n'
-    arquivo.write(modo)
-
     framesSimulacao = []
     roundsSimulacao = []
 
@@ -91,19 +88,16 @@ for modoOp in modosHop:
 
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
-        while(Round <= 5000 and len(nodes) != 0):
+        while(Round <= 4000 and len(nodes) != 0):
 
-            #Round += 1
             #arquivo_bat.write('>>>>>> Round ' + str(Round) + ' <<<<<<<\n')
 
-# =============================================================================
-#             # Energy Harvesting
-#             H = irradiacao(Round)
-#             for n in nodes:
-#                 n[1] += harvest(H)
-#                 if n[1] >= 5.0:
-#                     n[1] = 5.0
-# =============================================================================
+            # Energy Harvesting
+            H = irradiacao(Round)
+            for n in nodes:
+                n[1] += harvest(H)
+                if n[1] >= 5.0:
+                    n[1] = 5.0
 
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):
@@ -288,11 +282,11 @@ for modoOp in modosHop:
                 # FIM DE UM ROUND ##########
 
         df = pd.DataFrame(nosVivos, columns=['NosVivos'])
-        #print('Simulacao ' + str(simulacao+1) + ": " + str(totalFrames))
+        print('Simulacao ' + str(simulacao+1) + ": " + str(Round))
         roundsSimulacao.append(Round-1)
 
         resultados = 'Simulacao: ' + str(simulacao) + ' Rounds: ' + str(Round-1) + ' Nos Vivos: ' + str(len(nodes)) + '\n'
-        arquivo.write(resultados)
+        #arquivo.write(resultados)
 
         # FIM DE UMA SIMULAÇÃO ##########
     ############################### Estatísticas ################################
@@ -302,7 +296,7 @@ for modoOp in modosHop:
     print('Rounds: ', roundsSimulacao)
     print('Média: ' + str(media))
     print('Erro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(total_simulacoes) )))
-
+    arquivo.write("\nResultado do " + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:\nRounds: "+ str(roundsSimulacao) +"\nMédia: " + str(media) +'\nErro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(total_simulacoes) )))
     # FIM DE TODOS OS EXPERIMENTOS DE UM MODO DE OPERAÇÃO ##########
 
 #plt.plot(df.index, df['NosVivos'])
