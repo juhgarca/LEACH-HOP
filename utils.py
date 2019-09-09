@@ -10,7 +10,7 @@ def gerarCenario(qtdNodes,distMax):
     for i in range(1, qtdNodes+1):
         x = round(np.random.uniform(0, c.area), 2)
         y = round(np.random.uniform(0, c.area), 2)
-        nodes.append([i, 0.5, x, y, distMax, 0, 0, [], [], 0])
+        nodes.append([i, 5.0, x, y, distMax, 0, 0, [], [], 0])
     return nodes
 
 def distancia(x1,y1,x2,y2):

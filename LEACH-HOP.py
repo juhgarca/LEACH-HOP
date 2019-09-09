@@ -4,6 +4,7 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 from energySource import irradiacao, harvest
 from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
 
@@ -24,8 +25,8 @@ def selecao_CH(nodes, Round, Porcentagem):
 CH = []
 tamPacoteConfig = 300
 
-modosHop = [[0,0],[0,1],[1,0],[1,1]]
-#modosHop = [[0,0]]
+#modosHop = [[0,0],[0,1],[1,0],[1,1]]
+modosHop = [[0,0]]
 
 list_qtdNodes = [100]
 list_qtdFrames = [10]
@@ -34,9 +35,9 @@ list_percentualCH = [0.05]
 list_qtdSetores = [4]
 list_area = [100]
 
-total_simulacoes = 33
+total_simulacoes = 1
 arquivo = open('novo-arquivo.txt', 'w')
-arquivo_bat = open('bateria.txt', 'w')
+arquivo_bat = open('bateria.txt', 'a')
 
 ############################### Main ################################
 # Realiza a variação de um dos cenários (Quem usar a variável: cenario)
@@ -90,14 +91,15 @@ for modoOp in modosHop:
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 4000 and len(nodes) != 0):
 
-            #arquivo_bat.write('>>>>>> Round ' + str(Round) + ' <<<<<<<\n')
-
             # Energy Harvesting
+            start = time.time()
             H = irradiacao(Round)
             for n in nodes:
                 n[1] += harvest(H)
                 if n[1] >= 5.0:
                     n[1] = 5.0
+            end = time.time()
+            print(end-start)
 
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):
@@ -260,18 +262,20 @@ for modoOp in modosHop:
 
                 # FECHAMENTO DO ROUND
                 # Encerramento do Round
+                bat = list()
                 for k in CH:
                     nodes.append(k)
                 for k in nodes:
                     k[4] = distMax
                     k[7] = []
                     k[8] = []
-
+                    bat.append({k[0]: k[1]})
+                
                 #Exclui zerados
                 checaBateria(nodes)
 
                 nosVivos.append(len(nodes))
-                #resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
+                resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
                 #print('Simulação: ' + str(simulacao) + ' Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n')
                 #arquivo.write(resultados)
 
@@ -280,7 +284,7 @@ for modoOp in modosHop:
 
 
                 # FIM DE UM ROUND ##########
-
+        arquivo_bat.write(str(Round) + str(bat) + "\n")
         df = pd.DataFrame(nosVivos, columns=['NosVivos'])
         print('Simulacao ' + str(simulacao+1) + ": " + str(Round))
         roundsSimulacao.append(Round-1)

@@ -8,7 +8,7 @@ import pandas as pd
 import config as c
 from sympy import integrate, symbols
 
-df = pd.read_csv('trace_setupC_48h_1.txt')
+df = pd.read_csv('trace_setupC_48h.txt')
 
 def irradiacao(Round):
     I = df['energia'][Round] * 10 ** -6
@@ -19,6 +19,4 @@ def irradiacao(Round):
 
 def harvest(H):
     d = c.cell_size * c.cell_efic * H
-    #d = c.cell_size * c.cell_efic * df['energia'][Round] * c.round_len
-    #print(d)
     return d
