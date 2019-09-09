@@ -37,7 +37,7 @@ list_area = [100]
 
 total_simulacoes = 1
 arquivo = open('novo-arquivo.txt', 'w')
-arquivo_bat = open('bateria.txt', 'a')
+arquivo_bat = open('bateria.csv', 'a')
 
 ############################### Main ################################
 # Realiza a variação de um dos cenários (Quem usar a variável: cenario)
@@ -58,6 +58,12 @@ print("\n\nCENÁRIO: " + str(qtdNodes) + ' nodes, '
                   + str(int(percentualCH*100)) + '%, '
                   + str(int(qtdSetores)) + ' setores, '
                   + str(int(area)) + ' m2')
+
+col = "Round"
+for i in range(1,qtdNodes+1):
+    col += " id bat"
+arquivo_bat.write(col + "\n")
+    
 
 # Altera entre os modos de operação do multi-hop
 for modoOp in modosHop:
@@ -90,6 +96,12 @@ for modoOp in modosHop:
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 4000 and len(nodes) != 0):
+            
+            linha = str(Round)
+            nodes.sort()
+            for n in nodes:
+                linha += " " + str(n[0]) + " " + str(n[1])
+            arquivo_bat.write(linha + "\n")
 
             # Energy Harvesting
             start = time.time()
