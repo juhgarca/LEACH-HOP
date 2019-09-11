@@ -4,7 +4,6 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import time
 from energySource import irradiacao, harvest
 from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
 
@@ -37,7 +36,7 @@ list_area = [100]
 
 total_simulacoes = 1
 arquivo = open('novo-arquivo.txt', 'w')
-arquivo_bat = open('bateria.txt', 'a')
+arquivo_bat = open('bateria.csv', 'a')
 
 ############################### Main ################################
 # Realiza a variação de um dos cenários (Quem usar a variável: cenario)
@@ -58,6 +57,12 @@ print("\n\nCENÁRIO: " + str(qtdNodes) + ' nodes, '
                   + str(int(percentualCH*100)) + '%, '
                   + str(int(qtdSetores)) + ' setores, '
                   + str(int(area)) + ' m2')
+
+col = "Round"
+for i in range(1,qtdNodes+1):
+    col += " id bat"
+arquivo_bat.write(col + "\n")
+    
 
 # Altera entre os modos de operação do multi-hop
 for modoOp in modosHop:
@@ -90,16 +95,20 @@ for modoOp in modosHop:
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 4000 and len(nodes) != 0):
+            
+            linha = str(Round)
+            nodes.sort()
+            for n in nodes:
+                linha += " " + str(n[0]) + " " + str(n[1], 5)
+            arquivo_bat.write(linha + "\n")
 
             # Energy Harvesting
-            start = time.time()
             H = irradiacao(Round)
+            eh = harvest(H)
             for n in nodes:
-                n[1] += harvest(H)
+                n[1] += eh
                 if n[1] >= 5.0:
                     n[1] = 5.0
-            end = time.time()
-            print(end-start)
 
             #Verifica Reset do Round Superior
             if(verifica_eleitos(nodes)):

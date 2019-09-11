@@ -71,6 +71,7 @@ for modoOp in cf.modosHop:
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 4000 and len(nodes) != 0):
+                
 
             # Energy Harvesting
             start = time.time()

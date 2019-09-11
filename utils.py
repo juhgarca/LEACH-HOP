@@ -2,14 +2,14 @@
 
 import math
 import numpy as np
-import config as c
+import config as cf
 
 
 def gerarCenario(qtdNodes,distMax):
     nodes = []
     for i in range(1, qtdNodes+1):
-        x = round(np.random.uniform(0, c.area), 2)
-        y = round(np.random.uniform(0, c.area), 2)
+        x = round(np.random.uniform(0, cf.area), 2)
+        y = round(np.random.uniform(0, cf.area), 2)
         nodes.append([i, cf.bat_init, x, y, distMax, 0, 0, [], [], 0])
     return nodes
 
@@ -116,3 +116,41 @@ def desvio_padrao(valores, media):
     for valor in valores:
         soma += math.pow( (valor - media), 2)
     return math.sqrt( soma / float( len(valores) ) )
+
+def calculaOCHP():
+    Er_har = cf.qtdNodes*n*Lr*Ts             # Joules
+    Er_net = 0
+    consumo = list()
+
+    for k in range(kmin, kmax+1):
+        pi = k/N
+        Nf = Lr*k/N
+        Lc = N/k
+        Eagg = (5*10**-9 * payload) * (Lc-1)         # Joules
+        Esetup = Emax_tx + ((Lc-1)*Erx) + Emax_tx    # Joules
+        Er_ch = Nf * (Emax_tx + (Lc-1)*Erx + Eagg) + Esetup     # Joules
+        Er_nch = Nf * (Lc-1) * Ts * Pch_tx                      # Joules
+        temp = k * (Er_ch + Er_nch)
+        consumo.append(temp)
+        
+        if(temp < Er_har and temp > Er_net):
+            kopt = k
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

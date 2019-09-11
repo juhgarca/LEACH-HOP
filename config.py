@@ -6,7 +6,7 @@ totalSimulacoes = 33
 
 tamPacoteConfig = 300
 
-bat_init = 2.5
+bat_init = 5.0
 
 modosHop = [[0,0]]
 #modosHop = [[0,0], [0,1], [1,0], [1,1]]
