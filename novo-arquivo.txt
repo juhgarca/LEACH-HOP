@@ -1,5 +1,5 @@
 
 Resultado do 00-LEACH-HOP:
-Rounds: [4000]
-Média: 4000.0
+Rounds: [5000]
+Média: 5000.0
 Erro: 0.0

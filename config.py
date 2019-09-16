@@ -8,7 +8,7 @@ tamPacoteConfig = 300
 
 bat_init = 5.0
 
-modosHop = [[0,0]]
+modosHop = [[1,1]]
 #modosHop = [[0,0], [0,1], [1,0], [1,1]]
 
 list_qtdNodes = [100]
@@ -29,6 +29,7 @@ qtdSetores =                     list_qtdSetores[0]
 area =                                 list_area[0]
 
 BS = [0, area+25.0, area/2, 0.0, 0]
+payload = tamPacoteTransmissao
 
 # [gorlatova2012networking]
 cell_size = 10      # cm^2
@@ -39,16 +40,36 @@ max_bat = 5.0       # Joules
 # DC-LEACH
 kmin = 5
 kmax = 20
-kopt = 0
-Ts = 0.1    # tempo de slot (segundo)
-Lr = 500    # tamanho do round (timeslots)
-Tr = Lr * Ts    # tempo do round (segundos)
-Lhor = 10   # horizonte de predição (rounds)
+kopt = kmin
+timeslot = 0.1    # tempo de slot (segundo)
+round_length = 500    # tamanho do round (timeslots)
+round_time = round_length * timeslot    # tempo do round (segundos)
+horizon = 10   # horizonte de predição (rounds)
+
+cluster_len = qtdNodes/kopt
 
 cz = 0.000154   # m^2
 ez = 0.22
 Io = 200    # W/m^2
 
-Pmax_tx = 0.0801    # W
-Prx = 0.0222    # W
-p = 0.5     # pacotes/s
+pwr_max_tx = 0.0801    # W
+pwr_rx = 0.0222    # W
+packet_rate = 0.5     # pacotes/s
+
+ener_max_tx = pwr_max_tx * timeslot
+ener_rx = pwr_rx * timeslot
+ener_nch_tx = 0.0444    # W (valor aproximado para a primeira vez, já que não tem como calcular)
+ener_agg = 0.00001*(cluster_len-1)
+ener_setup = ener_max_tx + (cluster_len-1)*ener_rx + ener_nch_tx
+ener_ch_tx = ener_nch_tx    # W (valor aproximado para a primeira vez, já que não tem como calcular)
+
+
+
+
+
+
+
+
+
+
+

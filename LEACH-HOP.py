@@ -4,6 +4,7 @@ import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import config as cf
 from energySource import irradiacao, harvest
 from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
 
@@ -34,7 +35,6 @@ list_percentualCH = [0.05]
 list_qtdSetores = [4]
 list_area = [100]
 
-total_simulacoes = 1
 arquivo = open('novo-arquivo.txt', 'w')
 arquivo_bat = open('bateria.csv', 'a')
 
@@ -73,7 +73,7 @@ for modoOp in modosHop:
     roundsSimulacao = []
 
     # Iteração para realizar várias iterações (total de simulações)
-    for simulacao in range(total_simulacoes):
+    for simulacao in range(cf.total_simulacoes):
         Round = 1
         totalRounds = 0
         nodes = gerarCenario(qtdNodes,distMax)
@@ -94,17 +94,17 @@ for modoOp in modosHop:
 
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
-        while(Round <= 4000 and len(nodes) != 0):
+        while(Round <= 5000 and len(nodes) != 0):
             
             linha = str(Round)
             nodes.sort()
             for n in nodes:
-                linha += " " + str(n[0]) + " " + str(n[1], 5)
+                linha += " " + str(n[0]) + " " + str(n[1])
             arquivo_bat.write(linha + "\n")
 
             # Energy Harvesting
-            H = irradiacao(Round)
-            eh = harvest(H)
+            #H = irradiacao(Round)
+            eh = harvest(Round)
             for n in nodes:
                 n[1] += eh
                 if n[1] >= 5.0:
@@ -290,7 +290,7 @@ for modoOp in modosHop:
 
                 CH = []
                 Round = Round + 1
-
+                print("Round", Round-1, "Nós vivos: ", len(nodes))
 
                 # FIM DE UM ROUND ##########
         arquivo_bat.write(str(Round) + str(bat) + "\n")
@@ -303,13 +303,13 @@ for modoOp in modosHop:
 
         # FIM DE UMA SIMULAÇÃO ##########
     ############################### Estatísticas ################################
-    media = sum(roundsSimulacao) / total_simulacoes
+    media = sum(roundsSimulacao) / cf.total_simulacoes
 
     print('\nResultado do ' + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:")
     print('Rounds: ', roundsSimulacao)
     print('Média: ' + str(media))
-    print('Erro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(total_simulacoes) )))
-    arquivo.write("\nResultado do " + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:\nRounds: "+ str(roundsSimulacao) +"\nMédia: " + str(media) +'\nErro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(total_simulacoes) )))
+    print('Erro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(cf.total_simulacoes) )))
+    arquivo.write("\nResultado do " + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:\nRounds: "+ str(roundsSimulacao) +"\nMédia: " + str(media) +'\nErro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(cf.total_simulacoes) )))
     # FIM DE TODOS OS EXPERIMENTOS DE UM MODO DE OPERAÇÃO ##########
 
 #plt.plot(df.index, df['NosVivos'])

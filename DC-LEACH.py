@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import config as cf
-from energySource import irradiacao, harvest
+from energySource import harvest, prediction
 from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
 
 
@@ -20,6 +20,29 @@ def selecao_CH(nodes, Round, Porcentagem):
       CH.append(k)
       nodes.remove(k)
   return CH
+
+def calculaOCHP():
+    for k in range(cf.kmin, cf.kmax+1):
+        pi = k/cf.qtdNodes
+        num_frames = cf.round_length*k/cf.qtdNodes
+        cluster_len = cf.qtdNodes/k
+        ener_agg = (5*10**-9 * cf.payload) * (cluster_len-1)         # Joules
+        ener_setup = cf.ener_max_tx + ((cluster_len-1)*cf.ener_rx) + cf.ener_nch_tx    # Joules
+        ener_ch_round = num_frames * (cf.ener_max_tx + (cluster_len-1)*cf.ener_rx + ener_agg) + ener_setup     # Joules
+        ener_nch_round = num_frames * (cluster_len-1) * cf.ener_ch_tx      # Joules
+        temp = k * (ener_ch_round + ener_nch_round)
+    
+        if(temp < Er_har and temp > Er_net):
+            kopt = k
+    
+    pi = kopt/N
+    Nf = Lr*kopt/N
+    Lc = N/kopt
+    Eagg = (5*10**-9 * payload) * (Lc-1)         # Joules
+    Esetup = Emax_tx + ((Lc-1)*Erx) + Emax_tx    # Joules
+    Er_ch = Nf * (Emax_tx + (Lc-1)*Erx + Eagg) + Esetup     # Joules
+    Er_nch = Nf * (Lc-1) * Ts * Pch_tx                      # Joules
+    Er_net = kopt * (Er_ch + Er_nch)
 
 
 ############################### Variables ################################
@@ -70,23 +93,20 @@ for modoOp in cf.modosHop:
 
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
-        while(Round <= 4000 and len(nodes) != 0):
-                
+        while(Round <= 5000 and len(nodes) != 0):
+            
+
+            
+            
+            
+            
 
             # Energy Harvesting
-            start = time.time()
-            H = irradiacao(Round)
+            eh = harvest(Round)
             for n in nodes:
-                n[1] += harvest(H)
+                n[1] += eh
                 if n[1] >= 5.0:
                     n[1] = 5.0
-            end = time.time()
-            print(end-start)
-
-            #Verifica Reset do Round Superior
-            if(verifica_eleitos(nodes)):
-                for k in nodes:
-                    k[6] = 0
 
             # Realiza seleção de CH
             CH = selecao_CH(nodes, Round, cf.percentualCH)
