@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import random
 import math
-import numpy as np
+#import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import time
+#import matplotlib.pyplot as plt
 import config as cf
 from energySource import harvest, prediction
-from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
+from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH
 
 
 def selecao_CH(nodes, Round, Porcentagem):
@@ -21,9 +20,10 @@ def selecao_CH(nodes, Round, Porcentagem):
       nodes.remove(k)
   return CH
 
-def calculaOCHP():
+def calculaOCHP(ener_har_round):
+    ener_net_round = 0
+    
     for k in range(cf.kmin, cf.kmax+1):
-        pi = k/cf.qtdNodes
         num_frames = cf.round_length*k/cf.qtdNodes
         cluster_len = cf.qtdNodes/k
         ener_agg = (5*10**-9 * cf.payload) * (cluster_len-1)         # Joules
@@ -32,17 +32,13 @@ def calculaOCHP():
         ener_nch_round = num_frames * (cluster_len-1) * cf.ener_ch_tx      # Joules
         temp = k * (ener_ch_round + ener_nch_round)
     
-        if(temp < Er_har and temp > Er_net):
+        if(temp <= ener_har_round and temp > ener_net_round):
             kopt = k
+            ener_net_round = temp
+            
+    return kopt
     
-    pi = kopt/N
-    Nf = Lr*kopt/N
-    Lc = N/kopt
-    Eagg = (5*10**-9 * payload) * (Lc-1)         # Joules
-    Esetup = Emax_tx + ((Lc-1)*Erx) + Emax_tx    # Joules
-    Er_ch = Nf * (Emax_tx + (Lc-1)*Erx + Eagg) + Esetup     # Joules
-    Er_nch = Nf * (Lc-1) * Ts * Pch_tx                      # Joules
-    Er_net = kopt * (Er_ch + Er_nch)
+
 
 
 ############################### Variables ################################
@@ -95,9 +91,17 @@ for modoOp in cf.modosHop:
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 5000 and len(nodes) != 0):
             
-
+            ener_har_round = prediction(Round) * cf.qtdNodes
+            kopt = calculaOCHP(ener_har_round)
             
-            
+            pi = kopt/cf.qtdNodes
+            num_frames = cf.round_length*kopt/cf.qtdNodes
+            cluster_len = cf.qtdNodes/kopt
+            ener_agg = (5*10**-9 * cf.payload) * (cluster_len-1)         # Joules
+            ener_setup = cf.ener_max_tx + ((cluster_len-1)*cf.ener_rx) + cf.ener_nch_tx    # Joules
+            ener_ch_round = num_frames * (cf.ener_max_tx + (cluster_len-1)*cf.ener_rx + ener_agg) + ener_setup     # Joules
+            ener_nch_round = num_frames * (cluster_len-1) * cf.ener_ch_tx                      # Joules
+            ener_net_round = kopt * (ener_ch_round + ener_nch_round)
             
             
 
