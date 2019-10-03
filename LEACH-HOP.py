@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import random
 import math
-import numpy as np
+#import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import config as cf
-from energySource import irradiacao, harvest
+from energySource import harvest
 from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
 
 
