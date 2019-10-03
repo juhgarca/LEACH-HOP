@@ -34,7 +34,7 @@ payload = tamPacoteTransmissao
 # [gorlatova2012networking]
 cell_size = 10      # cm^2
 cell_efic = 0.01
-round_len = 20      # segundos
+round_len = 50      # segundos
 max_bat = 5.0       # Joules
 
 # DC-LEACH
@@ -48,9 +48,8 @@ horizon = 10   # horizonte de predição (rounds)
 
 cluster_len = qtdNodes/kopt
 
-cz = 0.000154   # m^2
-ez = 0.22
-Io = 200    # W/m^2
+#cell_size = 1.54   # cm^2
+#cell_efic = 0.22
 
 pwr_max_tx = 0.0801    # W
 pwr_rx = 0.0222    # W
