@@ -62,7 +62,7 @@ col = "Round"
 for i in range(1,qtdNodes+1):
     col += " id bat"
 arquivo_bat.write(col + "\n")
-    
+
 
 # Altera entre os modos de operação do multi-hop
 for modoOp in modosHop:
@@ -95,7 +95,7 @@ for modoOp in modosHop:
 
         # INICIO DA EXECUÇÃO DA SIMULAÇÃO
         while(Round <= 5000 and len(nodes) != 0):
-            
+
             linha = str(Round)
             nodes.sort()
             for n in nodes:
@@ -110,7 +110,7 @@ for modoOp in modosHop:
                 if n[1] >= 5.0:
                     n[1] = 5.0
 
-            #Verifica Reset do Round Superior
+            #Verifica Reset do Round Superior (Se todos os nós já foram CH)
             if(verifica_eleitos(nodes)):
                 for k in nodes:
                     k[6] = 0
@@ -132,7 +132,7 @@ for modoOp in modosHop:
                     k[7].append(BS)
                     k[1] = gastoTx(k[1],k[4],tamPacoteConfig)
 
-                # RECEPÇÃO     CH: Chs recebem o broadcast dos outros CHs (os rádios estão ligados)
+                # RECEPÇÃO CH: Chs recebem o broadcast dos outros CHs (os rádios estão ligados)
                 for k in CH:
                     for node in pacotesBroadcast:
                         if(node[0] != k[0]):
@@ -279,7 +279,7 @@ for modoOp in modosHop:
                     k[7] = []
                     k[8] = []
                     bat.append({k[0]: k[1]})
-                
+
                 #Exclui zerados
                 checaBateria(nodes)
 
