@@ -32,9 +32,6 @@ ener_setup = ener_max_tx + (cluster_len-1)*ener_rx + ener_nch_tx
 ener_ch_tx = ener_nch_tx    # W (valor aproximado para a primeira vez, já que não tem como calcular)
 
 
-
-
-
 def calculaOCHP():
     
     ener_r_net = 0
@@ -95,14 +92,14 @@ def calculaDTDC(Dch):
     return Ddt
 
 
-pi = kopt/qtdNodes
+""" pi = kopt/qtdNodes
 num_frames = round_length*kopt/qtdNodes
 cluster_len = qtdNodes/kopt
 ener_agg = (5*10**-9 * payload) * (cluster_len-1)         # Joules
 ener_setup = ener_max_tx + ((cluster_len-1)*ener_rx) + ener_max_tx    # Joules
 ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
 ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx                      # Joules
-ener_r_net = kopt * (ener_ch_round + ener_nch_round)
+ener_r_net = kopt * (ener_ch_round + ener_nch_round) """
 
 rounds = 10
 
@@ -114,6 +111,38 @@ for rnd in range(1, rounds+1):
     kopt = calculaOCHP()
     
     
+
+Round = 1
+horizon_ctrl = 0
+num_frames = 2
+horizon = 4
+
+while Round <= 20:
+
+    print(">>>>>>>>> INÍCIO DO ROUND", Round)
+
+    if horizon_ctrl == 0:
+        print("   calculaOCHP()")
+        print("   calculaCHCD()\n")
+    
+    print("CHs se anunciam")
+    print("NCHs se associam")
+    print("Chs enviam TDMA")
+    print("NCHs calculaDTDC()\n")
+
+    frames_ctrl = 1
+    while frames_ctrl <= num_frames:
+        print("--> Frame", frames_ctrl)
+        print("     NCHs enviam dados para CHs")
+        print("     CHs agregam dados")
+        print("     CHs enviam dados para BS")
+
+        frames_ctrl += 1
+    
+    horizon_ctrl += 1
+    if horizon_ctrl == horizon: horizon_ctrl = 0
+    print(">>>>>>>>> FIM DO ROUND", Round, "\n")
+    Round += 1
     
     
     
