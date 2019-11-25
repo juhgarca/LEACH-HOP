@@ -28,7 +28,7 @@ packet_rate = 0.5     # pacotes/s
 
 ener_max_tx = pwr_max_tx * timeslot
 ener_rx = pwr_rx * timeslot
-ener_nch_tx = 0.0444    # W (valor aproximado para a primeira vez, já que não tem como calcular)
+ener_nch_tx = 0.00444    # W (valor aproximado para a primeira vez, já que não tem como calcular)
 ener_agg = 0.00001*(cluster_len-1)
 ener_setup = ener_max_tx + (cluster_len-1)*ener_rx + ener_nch_tx
 ener_ch_tx = ener_nch_tx    # W (valor aproximado para a primeira vez, já que não tem como calcular)
@@ -57,8 +57,10 @@ def calculaOCHP():
         ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
         ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx      # Joules
         temp = k * (ener_ch_round + ener_nch_round)
+        print("temp:", temp, "ener r har:", ener_r_har)
     
-        if(temp <= ener_r_har and temp > ener_r_net):
+        if (temp <= ener_r_har and temp > ener_r_net):
+            print("ENTROU!")
             kopt = k
             ener_r_net = temp
     
@@ -68,6 +70,7 @@ def calculaCHDC():
 
     print("Calculando duty-cycle do cluster head")
     kopt = calculaOCHP()
+    print(">>>>", kopt)
     pi = kopt/qtdNodes
     dcch = 1/pi
     if (dcch >= 1):
@@ -112,15 +115,6 @@ def calculaDTDC(Dch):
     return Ddt
 
 
-""" pi = kopt/qtdNodes
-num_frames = round_length*kopt/qtdNodes
-cluster_len = qtdNodes/kopt
-ener_agg = (5*10**-9 * payload) * (cluster_len-1)         # Joules
-ener_setup = ener_max_tx + ((cluster_len-1)*ener_rx) + ener_max_tx    # Joules
-ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
-ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx                      # Joules
-ener_r_net = kopt * (ener_ch_round + ener_nch_round) """
-
 
 # Início da simulação    
 
@@ -137,6 +131,7 @@ while Round <= 20:
     if horizon_ctrl == 0:
         harv_pwr = prediction(Round)
         ener_r_har = qtdNodes*harv_pwr            # Joules
+        print(">>>>>>>>>>>>", ener_r_har)
         for n in nodes:
             n[4], n[5] = calculaCHDC()
 
@@ -175,9 +170,9 @@ while Round <= 20:
     
     #Controle do contador do Dch
     for n in nodes:
-        if n[5] < Dch:
+        if n[5] < n[4]:
             n[5] +=1
-        elif n[5] == Dch:
+        elif n[5] == n[4]:
             print("Reset count")
             n[5] = 1
     
