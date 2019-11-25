@@ -1,4 +1,4 @@
-
+""" 
 Round = 1
 horizon_ctrl = 0
 num_frames = 2
@@ -30,4 +30,26 @@ while Round <= 20:
     if horizon_ctrl == horizon: horizon_ctrl = 0
     print(">>>>>>>>> FIM DO ROUND", Round, "\n")
     Round += 1
-    
+     """
+
+import numpy as np
+
+Dch = 3
+count_dch = np.random.randint(1, Dch+1)
+
+i=1
+while i < 21:
+    if count_dch == 1:
+        print(count_dch, " SOU CH")
+    else:
+        print(count_dch, " SOU NCH")
+
+    if count_dch < Dch:
+        count_dch +=1
+    elif count_dch == Dch:
+        print("Reset count")
+        count_dch = 1
+
+
+
+    i +=1
