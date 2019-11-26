@@ -35,15 +35,16 @@ while Round <= 20:
 import numpy as np
 
 Dch = 3
-count_dch = np.random.randint(1, Dch+1)
 
+count_dch = np.random.randint(1, Dch+1)
 i=1
 while i < 21:
+    
     if count_dch == 1:
         print(count_dch, " SOU CH")
     else:
         print(count_dch, " SOU NCH")
-
+        
     if count_dch < Dch:
         count_dch +=1
     elif count_dch == Dch:
