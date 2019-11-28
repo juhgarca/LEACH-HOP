@@ -2,7 +2,7 @@
 
 import math
 import numpy as np
-import config as cf
+from config import *
 
 
 def gerarCenario(qtdNodes,distMax):
@@ -12,6 +12,88 @@ def gerarCenario(qtdNodes,distMax):
         y = round(np.random.uniform(0, cf.area), 2)
         nodes.append([i, cf.bat_init, x, y, distMax, 0, 0, [], [], 0])
     return nodes
+
+
+def generateNodes():
+    print("Gerando nós")
+    nodes = []
+    for i in range(1,qtdNodes+1):
+        x = round(np.random.uniform(0, area), 2)
+        y = round(np.random.uniform(0, area), 2)
+        nodes.append([i, 0.5, x, y, distMax, 0, 0, 0, 0])       # formato do nó: [id, bat, x, y, dch, count_dch, ddt, count_ddt]
+    
+    return nodes
+
+
+def calculaOCHP(self, ener_r_har):
+
+    print("Calculando porcentagem ótima de cluster heads")
+    ener_r_net = 0
+    kopt = 0
+    for k in range(kmin, kmax+1):
+        num_frames = round_length*k/qtdNodes
+        cluster_len = qtdNodes/k
+        ener_agg = (5*10**-9 * payload) * (cluster_len-1)         # Joules
+        ener_setup = ener_max_tx + ((cluster_len-1)*ener_rx) + ener_nch_tx    # Joules
+        ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
+        ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx      # Joules
+        temp = k * (ener_ch_round + ener_nch_round)
+    
+        if (temp <= ener_r_har and temp > ener_r_net):
+            kopt = k
+            ener_r_net = temp
+    
+    return kopt
+
+
+def calculaCHDC(ener_har):
+
+    print("Calculando duty-cycle do cluster head")
+    kopt = calculaOCHP(ener_har)
+    pi = kopt/qtdNodes
+    dcch = 1/pi
+    if (dcch >= 1):
+        Dch = math.ceil(dcch)
+    else:
+        Dch = 1
+    
+    count = np.random.randint(1, Dch+1)
+        
+    return Dch, count, kopt
+        
+
+def calculaDTDC(Dch):
+
+    print("Calculando duty-cycle de transmissão de dados")
+    num_nch_rounds = horizon - (horizon/Dch)
+    ener_rem_nch = (harv_pwr*horizon - ener_ch_round*(horizon-num_nch_rounds))/ num_nch_rounds
+    
+    pt1 = (ener_ch_tx*num_frames)/ener_rem_nch
+    print("\nPt1 =", pt1)
+    if (pt1 >= 1 and pt1 <= num_frames):
+       Dene_dt = math.ceil(pt1)
+    else:
+        Dene_dt = 1
+    print("Dene_dt =", Dene_dt)
+    
+    pt2 = num_frames/(packet_rate*round_time)
+    print("Pt2 =", pt2)
+    if (pt2 >= 1 and pt2 <= num_frames):
+        Ddata_dt = math.floor(pt2)
+    else:
+        Ddata_dt = 1
+    print("Ddata_dt =", Ddata_dt)
+    
+    dtdc = max(Dene_dt, Ddata_dt)
+    print("\nDT-DC =", dtdc)
+    if (dtdc > num_frames):
+        Ddt = 0
+    elif (dtdc >= 1 and dtdc <= num_frames):
+        Ddt = dtdc
+    print("Ddt =", Ddt)
+    
+    return Ddt
+
 
 def distancia(x1,y1,x2,y2):
   return math.sqrt((x1-x2)**2 + (y1-y2)**2)

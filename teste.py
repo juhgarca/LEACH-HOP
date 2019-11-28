@@ -1,3 +1,7 @@
+from config import *
+
+print(bat_init)
+
 """ 
 Round = 1
 horizon_ctrl = 0
@@ -32,16 +36,22 @@ while Round <= 20:
     Round += 1
      """
 
-import numpy as np
+""" import numpy as np
 
 Dch = 3
+energia = 3
+limiar = 3
 
 count_dch = np.random.randint(1, Dch+1)
 i=1
 while i < 21:
     
     if count_dch == 1:
-        print(count_dch, " SOU CH")
+        if energia >= limiar:
+            print(count_dch, " SOU CH")
+        else:
+            count_dch = 0
+            print("recharging...")
     else:
         print(count_dch, " SOU NCH")
         
@@ -51,6 +61,11 @@ while i < 21:
         print("Reset count")
         count_dch = 1
 
+    if i == 12:
+        energia = 2
 
+    if i == 17:
+        energia +=1
 
-    i +=1
+    i +=1 """
+
