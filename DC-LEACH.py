@@ -1,316 +1,185 @@
 # -*- coding: utf-8 -*-
-import random
+"""
+Created on Thu Oct  3 08:18:15 2019
+
+@author: Juliana
+"""
+from energySource import prediction, harvest
 import math
-#import numpy as np
-import pandas as pd
-#import matplotlib.pyplot as plt
-import config as cf
-from energySource import harvest, prediction
-from utils import gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH
+import numpy as np
+from utils import generateNodes, gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
+from config import *
 
 
-def selecao_CH(nodes, Round, Porcentagem):
-  CH = []
-  for k in nodes:
-    rand = random.random()
-    limiar = Porcentagem / (1.0 - Porcentagem * (Round % (1.0 / Porcentagem)))
-    if(limiar > rand) and (k[6] != 1):
-      k[6] = 1
-      CH.append(k)
-      nodes.remove(k)
-  return CH
+def calculaOCHP(ener_r_har):
 
-def calculaOCHP(ener_har_round):
-    ener_net_round = 0
-    
-    for k in range(cf.kmin, cf.kmax+1):
-        num_frames = cf.round_length*k/cf.qtdNodes
-        cluster_len = cf.qtdNodes/k
-        ener_agg = (5*10**-9 * cf.payload) * (cluster_len-1)         # Joules
-        ener_setup = cf.ener_max_tx + ((cluster_len-1)*cf.ener_rx) + cf.ener_nch_tx    # Joules
-        ener_ch_round = num_frames * (cf.ener_max_tx + (cluster_len-1)*cf.ener_rx + ener_agg) + ener_setup     # Joules
-        ener_nch_round = num_frames * (cluster_len-1) * cf.ener_ch_tx      # Joules
+    print("Calculando porcentagem ótima de cluster heads")
+    ener_r_net = 0
+    kopt = 0
+    for k in range(kmin, kmax+1):
+        num_frames = round_length*k/qtdNodes
+        cluster_len = qtdNodes/k
+        ener_agg = (5*10**-9 * payload) * (cluster_len-1)         # Joules
+        ener_setup = ener_max_tx + ((cluster_len-1)*ener_rx) + ener_nch_tx    # Joules
+        ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
+        ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx      # Joules
         temp = k * (ener_ch_round + ener_nch_round)
     
-        if(temp <= ener_har_round and temp > ener_net_round):
+        if (temp <= ener_r_har and temp > ener_r_net):
             kopt = k
-            ener_net_round = temp
-            
-    return kopt
+            ener_r_net = temp
     
+    return kopt
 
 
+def calculaCHDC(ener_har):
 
-############################### Variables ################################
+    print("Calculando duty-cycle do cluster head")
+    kopt = calculaOCHP(ener_har)
+    pi = kopt/qtdNodes
+    dcch = 1/pi
+    if (dcch >= 1):
+        Dch = math.ceil(dcch)
+    else:
+        Dch = 1
+    
+    count = np.random.randint(1, Dch+1)
+        
+    return Dch, count, kopt
+        
+
+def calculaDTDC(Dch):
+
+    print("Calculando duty-cycle de transmissão de dados")
+    num_nch_rounds = horizon - (horizon/Dch)
+    ener_rem_nch = (harv_pwr*horizon - ener_ch_round*(horizon-num_nch_rounds))/ num_nch_rounds
+    
+    pt1 = (ener_ch_tx*num_frames)/ener_rem_nch
+    print("\nPt1 =", pt1)
+    if (pt1 >= 1 and pt1 <= num_frames):
+       Dene_dt = math.ceil(pt1)
+    else:
+        Dene_dt = 1
+    print("Dene_dt =", Dene_dt)
+    
+    pt2 = num_frames/(packet_rate*round_time)
+    print("Pt2 =", pt2)
+    if (pt2 >= 1 and pt2 <= num_frames):
+        Ddata_dt = math.floor(pt2)
+    else:
+        Ddata_dt = 1
+    print("Ddata_dt =", Ddata_dt)
+    
+    dtdc = max(Dene_dt, Ddata_dt)
+    print("\nDT-DC =", dtdc)
+    if (dtdc > num_frames):
+        Ddt = 0
+    elif (dtdc >= 1 and dtdc <= num_frames):
+        Ddt = dtdc
+    print("Ddt =", Ddt)
+    
+    return Ddt
+
+
+###################################################################################################   
+
 CH = []
+Round = 1
+horizon_ctrl = 0
+qtdSetores = 2
 
-arquivo = open('novo-arquivo.txt', 'w')
-arquivo_bat = open('bateria.txt', 'a')
+modosHop = [[0,0]]
 
-############################### Main ################################
-# Realiza a variação de um dos cenários (Quem usar a variável: cenario)
-
-distMax = distancia(0,0, cf.area,cf.area)
-
-print("\n\nCENÁRIO: " + str(cf.qtdNodes) + ' nodes, '
-                  + str(cf.qtdFrames) + ' frames, '
-                  + str(cf.tamPacoteTransmissao) + ' bits, '
-                  + str(int(cf.percentualCH*100)) + '%, '
-                  + str(int(cf.qtdSetores)) + ' setores, '
-                  + str(int(cf.area)) + ' m2')
-
-# Altera entre os modos de operação do multi-hop
-for modoOp in cf.modosHop:
+for modoOp in modosHop:
     intraCluster = modoOp[0]
     interCluster = modoOp[1]
 
-    framesSimulacao = []
+    framesSimulacao = []  # <<<<<<<<<<< ATENTION!!!
     roundsSimulacao = []
 
     # Iteração para realizar várias iterações (total de simulações)
-    for simulacao in range(cf.total_simulacoes):
+    for simulacao in range(total_simulacoes):
         Round = 1
         totalRounds = 0
-        nodes = gerarCenario(cf.qtdNodes,distMax)
+        nodes = generateNodes()
+        arquivo = open('novo-arquivo.txt', 'w')
         nosVivos = list()
 
         if(interCluster == 1):
             # CONFIGURAÇÕES INICIAIS (Setorização intercluster)
             # Trasmite as localizações à BS
             distanciasBS = []
-            for k in nodes:
-                dist = distancia(k[2],k[3],cf.BS[1],cf.BS[2])
+            for n in nodes:
+                dist = distancia(n[2], n[3], BS[1], BS[2])
                 distanciasBS.append( dist )
-                k[1] = gastoTx(k[1],dist,cf.tamPacoteConfig)
+                n[1] = gastoTx(n[1], dist, tamPacoteConfig)
             # Recebe os setores da BS
-            for k in nodes:
-                k[9] = setorizacaoCH(distanciasBS,distanciasBS[k[0]-1],cf.qtdSetores)
-                k[1] = gastoRx(k[1],cf.tamPacoteConfig)
+            for n in nodes:
+                n[9] = setorizacaoCH(distanciasBS, distanciasBS[n[0]-1], qtdSetores)
+                n[1] = gastoRx(n[1], tamPacoteConfig)
 
 
-        # INICIO DA EXECUÇÃO DA SIMULAÇÃO
-        while(Round <= 5000 and len(nodes) != 0):
-            
-            ener_har_round = prediction(Round) * cf.qtdNodes
-            kopt = calculaOCHP(ener_har_round)
-            
-            pi = kopt/cf.qtdNodes
-            num_frames = cf.round_length*kopt/cf.qtdNodes
-            cluster_len = cf.qtdNodes/kopt
-            ener_agg = (5*10**-9 * cf.payload) * (cluster_len-1)         # Joules
-            ener_setup = cf.ener_max_tx + ((cluster_len-1)*cf.ener_rx) + cf.ener_nch_tx    # Joules
-            ener_ch_round = num_frames * (cf.ener_max_tx + (cluster_len-1)*cf.ener_rx + ener_agg) + ener_setup     # Joules
-            ener_nch_round = num_frames * (cluster_len-1) * cf.ener_ch_tx                      # Joules
-            ener_net_round = kopt * (ener_ch_round + ener_nch_round)
-            
-            
+        while Round <= 20:  # <------------------------- Início da Simulação
 
-            # Energy Harvesting
+            if horizon_ctrl == 0:
+                harv_pwr = prediction(Round)
+                #ener_r_har = qtdNodes*harv_pwr            # Joules
+                ener_r_har = qtdNodes*energy*round_length*timeslot
+                print(">>>>>>>>>>>>", ener_r_har)
+                for n in nodes:
+                    n[4], n[5], k = calculaCHDC(ener_r_har)
+
+            num_frames = round_length*k/qtdNodes
+            cluster_len = qtdNodes/k
+            ener_agg = (5*10**-9 * payload) * (cluster_len-1)         # Joules
+            ener_setup = ener_max_tx + ((cluster_len-1)*ener_rx) + ener_nch_tx    # Joules
+            ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
+            ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx      # Joules
+
+            print(">>>>>>>>> INÍCIO DO ROUND", Round)
+            arquivo.write("Round "+ str(Round) + ": ")
+
             eh = harvest(Round)
             for n in nodes:
                 n[1] += eh
-                if n[1] >= 5.0:
-                    n[1] = 5.0
+                if n[1] >= 5.0: n[1] = 5.0
 
-            # Realiza seleção de CH
-            CH = selecao_CH(nodes, Round, cf.percentualCH)
+            for n in nodes:
+                if n[6] == 1:
+                    if n[2] >= ener_ch_round:
+                        print(n[0], " SOU CH")
+                        arquivo.write(str(n[0])+ " | ")
+                    else:
+                        n[6] = 0
+                        print(n[0], "recharging...")
+            arquivo.write("\n")
+            
+            print("CHs se anunciam")
+            print("NCHs se associam")
+            print("Chs enviam TDMA")
+            print("NCHs calculaDTDC()\n")
 
-            # Conta os frames que foram executados
-            totalFramesExecutados = 0
+            frames_ctrl = 1
+            while frames_ctrl <= num_frames:
+                print("--> Frame", frames_ctrl)
+                print("     NCHs enviam dados para CHs")
+                print("     CHs agregam dados")
+                print("     CHs enviam dados para BS")
 
-            # Execução após seleção
-            if(len(CH) != 0):
-
-                # TRANSMISSÃO  CH: Envio do Broadcast
-                pacotesBroadcast = []
-                for k in CH:
-                    pacotesBroadcast.append( [k[0],k[2],k[3],0.0,k[9]] )
-                    # Registro da BS para envio
-                    k[7].append(cf.BS)
-                    k[1] = gastoTx(k[1],k[4],cf.tamPacoteConfig)
-
-                # RECEPÇÃO     CH: Chs recebem o broadcast dos outros CHs (os rádios estão ligados)
-                for k in CH:
-                    for node in pacotesBroadcast:
-                        if(node[0] != k[0]):
-                            k[7].append(node)
-                    k[1] = gastoRx(k[1],cf.tamPacoteConfig)
-
-                if(nodes != []):
-                    # RECEPÇÃO    NCH: Recepção dos Pacotes de Bradcast
-                    for k in nodes:
-                        menorDistancia = k[4]
-                        nodeMenorDistancia = []
-                        # Escolha do CH (o mais próximo)
-                        for nodesCH in pacotesBroadcast:
-                            dist = distancia(k[2],k[3],nodesCH[1],nodesCH[2])
-                            if(dist < menorDistancia):
-                                menorDistancia = dist
-                                nodeMenorDistancia = nodesCH
-                        # Atualização dos valores
-                        k[7] = [ nodeMenorDistancia ]
-                        k[4] = menorDistancia
-                        k[1] = gastoRx(k[1],cf.tamPacoteConfig)
-
-                    # TRANSMISSÃO NCH: Envio de Pacotes Resposta
-                    for k in nodes:
-                        node = [k[0],k[2],k[3],k[4],0]
-                        # localiza o CH escolhido na lista de CH e coloca seu node em ListCL do CH
-                        for nodeCH in CH:
-                            if(k[7][0][0] == nodeCH[0]):
-                                nodeCH[8].append(node)
-                        k[1] = gastoTx(k[1],k[4],cf.tamPacoteConfig)
-
-                    # RECEPÇÃO     CH: Recepção de Pacotes de Resposta
-                    for k in CH:
-                        # Nodes atribuídos na função anterior
-                        for l in range( len(k[8]) ):
-                            k[1] = gastoRx(k[1],cf.tamPacoteConfig)
-
-                    # TRANSMISSÃO  CH: Envio da Tabela TDMA
-                    ajuste_alcance_nodeCH(CH)
-                    clusters = []
-                    for k in CH:
-                        clusters.append( [k[0], setorizacao(k[8],cf.qtdSetores)] )
-                        k[1] = gastoTx(k[1],k[4],cf.tamPacoteConfig)
-
-                    # RECEPÇÃO    NCH: Recepção da Tabela TDMA
-                    for k in nodes:
-                        idCH = k[7][0][0]
-                        # Localiza o cluster do CH
-                        for clstr in clusters:
-                            if(clstr[0] == idCH):
-                                k[8] = clstr[1]
-                        k[1] = gastoRx(k[1],cf.tamPacoteConfig)
-
-                    # CONFIGURAÇÃO DE RADIO DOS CH PARA ALCANÇAR A BS
-                    for k in CH:
-                        k[4] = distancia(k[2],k[3], cf.BS[1],cf.BS[2])
-
-                    # MULTI-HOP INTRACLUSTER
-                    if(intraCluster == 1):
-                        for k in nodes:
-                            # Acho o setor dentro do clusters
-                            setor = 0
-                            for node in k[8]:
-                                if(k[0] == node[0]):
-                                    setor = node[4]
-                                    break
-                            # Achar node vizinho mais proximo
-                            id = k[7][0][0]
-                            menor = k[4]
-                            for node in k[8]:
-                                dist = distancia(k[2],k[3], node[1],node[2])
-                                if(dist < menor and node[4] < setor):
-                                    id = node[0]
-                                    menor = dist
-                            k[7] = [[id,0,0,menor,0]]
-                            k[4] = menor
-
-                    # MULTI-HOP INTERCLUSTER
-                    if(interCluster == 1):
-                        for k in CH:
-                            menor = k[4]
-                            for node in k[7]:
-                                dist = distancia(k[2],k[3], node[1],node[2])
-                                if(dist < menor and node[4] < k[9]):
-                                    menor = dist
-                                    k[4] = menor
-                                    k[7] = [node]
-
-                    # MAPEAMENTO DE ENCAMINHAMENTO NCH (Ids de destino dos nodes)
-                    mapaEncaminhamento = []
-                    for k in nodes:
-                        mapaEncaminhamento.append( k[7][0][0] )
-
-                    # FRAMES
-                    for contFrame in range(cf.qtdFrames):
-                        confirmaFrame = 0
-                        # NCH: Transmite Pacote
-                        for k in nodes:
-                            if(intraCluster == 1):
-                                # Gasto de agregação de dados
-                                totalContEnc = contEncaminhamento(k[0], mapaEncaminhamento)
-                                if(totalContEnc > 0):
-                                    k[1] = k[1] - (0.000000005*cf.tamPacoteTransmissao*(totalContEnc + 1))
-                            k[1] = gastoTx(k[1],k[4],cf.tamPacoteTransmissao)
-                        # CH: Recebe Pacote
-                        for k in CH:
-                            for l in range( contEncaminhamento(k[0], mapaEncaminhamento) ):
-                                k[1] = gastoRx(k[1],cf.tamPacoteTransmissao)
-                        # NCH: Recebe Pacote
-                        if(intraCluster == 1):
-                            for k in nodes:
-                                for l in range( contEncaminhamento(k[0], mapaEncaminhamento) ):
-                                    k[1] = gastoRx(k[1],cf.tamPacoteTransmissao)
-                        # CH: Envia Pacote para a BS
-                        for k in CH:
-                            # Gasto de agregação de dados
-                            totalContEnc = contEncaminhamento(k[0], mapaEncaminhamento)
-                            if(totalContEnc > 0):
-                                k[1] = k[1] - (0.000000005*cf.tamPacoteTransmissao*(totalContEnc + 1))
-                            node = k
-                            idDestino = node[7][0][0]
-                            while(idDestino != 0):
-                                node[1] = gastoTx(node[1],node[4],cf.tamPacoteTransmissao)
-                                node = localizaObjetoCH(idDestino,CH)
-                                # Gasto Recepção do node destino
-                                node[1] = gastoRx(node[1],cf.tamPacoteTransmissao)
-                                idDestino = node[7][0][0]
-                            node[1] = gastoTx(node[1],node[4],cf.tamPacoteTransmissao)
-                            if(node[1] >= 0):
-                                # Confirma que houve um envio a BS
-                                confirmaFrame += 1
-
-                        # Aumenta apenas se algum pacote foi enviado para a BS
-                        if(confirmaFrame > 0):
-                            totalFramesExecutados += 1
-
-                # FECHAMENTO DO ROUND
-                # Encerramento do Round
-                bat = list()
-                for k in CH:
-                    nodes.append(k)
-                for k in nodes:
-                    k[4] = distMax
-                    k[7] = []
-                    k[8] = []
-                    bat.append({k[0]: k[1]})
-                
-                #Exclui zerados
-                checaBateria(nodes)
-
-                nosVivos.append(len(nodes))
-                resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
-                #print('Simulação: ' + str(simulacao) + ' Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n')
-                #arquivo.write(resultados)
-
-                CH = []
-                Round = Round + 1
-
-
-                # FIM DE UM ROUND ##########
-        arquivo_bat.write(str(Round) + str(bat) + "\n")
-        df = pd.DataFrame(nosVivos, columns=['NosVivos'])
-        print('Simulacao ' + str(simulacao+1) + ": " + str(Round))
-        roundsSimulacao.append(Round-1)
-
-        resultados = 'Simulacao: ' + str(simulacao) + ' Rounds: ' + str(Round-1) + ' Nos Vivos: ' + str(len(nodes)) + '\n'
-        #arquivo.write(resultados)
-
-        # FIM DE UMA SIMULAÇÃO ##########
-    ############################### Estatísticas ################################
-    media = sum(roundsSimulacao) / cf.total_simulacoes
-
-    print('\nResultado do ' + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:")
-    print('Rounds: ', roundsSimulacao)
-    print('Média: ' + str(media))
-    print('Erro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(cf.total_simulacoes) )))
-    arquivo.write("\nResultado do " + str(modoOp[0]) + str(modoOp[1]) +"-LEACH-HOP:\nRounds: "+ str(roundsSimulacao) +"\nMédia: " + str(media) +'\nErro: ' + str(1.96*(desvio_padrao(roundsSimulacao, media) / math.sqrt(cf.total_simulacoes) )))
-    # FIM DE TODOS OS EXPERIMENTOS DE UM MODO DE OPERAÇÃO ##########
-
-#plt.plot(df.index, df['NosVivos'])
-#print("Last round:", max(df.index))
-
-arquivo.close()
-arquivo_bat.close()
+                frames_ctrl += 1
+            
+            horizon_ctrl += 1
+            if horizon_ctrl == horizon: horizon_ctrl = 0
+            
+            print(">>>>>>>>> FIM DO ROUND", Round, "\n")
+            
+            #Controle do contador do Dch
+            for n in nodes:
+                if n[6] < n[5]:
+                    n[6] +=1
+                elif n[6] == n[5]:
+                    print("Reset count")
+                    n[6] = 1
+            
+            Round += 1
+    

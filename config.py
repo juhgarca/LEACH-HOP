@@ -6,7 +6,7 @@ Definição das configurações dos nós, rede e simulação
 from utils import distancia
 
 
-totalSimulacoes = 33
+totalSimulacoes = 1
 
 tamPacoteConfig = 300
 
