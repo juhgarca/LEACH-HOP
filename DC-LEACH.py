@@ -121,7 +121,7 @@ for modoOp in modosHop:
 
         while Round <= 20:  # <------------------------- Início da Simulação
 
-            if horizon_ctrl == 0:
+            if horizon_ctrl == 0:   # <----------------- Controle do horizonte de predição
                 harv_pwr = prediction(Round)
                 #ener_r_har = qtdNodes*harv_pwr            # Joules
                 ener_r_har = qtdNodes*energy*round_length*timeslot
@@ -139,22 +139,35 @@ for modoOp in modosHop:
             print(">>>>>>>>> INÍCIO DO ROUND", Round)
             arquivo.write("Round "+ str(Round) + ": ")
 
-            eh = harvest(Round)
+            eh = harvest(Round)     # <------------------- Captura de energia
             for n in nodes:
                 n[1] += eh
                 if n[1] >= 5.0: n[1] = 5.0
 
-            for n in nodes:
+            for n in nodes:         # <------------------- "Seleção" de CH
                 if n[6] == 1:
                     if n[2] >= ener_ch_round:
+                        CH.append(n)
                         print(n[0], " SOU CH")
                         arquivo.write(str(n[0])+ " | ")
                     else:
                         n[6] = 0
                         print(n[0], "recharging...")
             arquivo.write("\n")
+
+            # Conta os frames que foram executados
+            totalFramesExecutados = 0
+
+            if(len(CH) != 0):
             
             print("CHs se anunciam")
+            # TRANSMISSÃO  CH: Envio do Broadcast
+                pacotesBroadcast = []
+                for k in CH:
+                    pacotesBroadcast.append( [k[0],k[2],k[3],0.0,k[9]] )
+                    # Registro da BS para envio
+                    k[7].append(BS)
+                    k[1] = gastoTx(k[1],k[4],tamPacoteConfig)
             print("NCHs se associam")
             print("Chs enviam TDMA")
             print("NCHs calculaDTDC()\n")
