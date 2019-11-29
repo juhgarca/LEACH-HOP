@@ -20,7 +20,7 @@ def generateNodes():
     for i in range(1,cf.qtdNodes+1):
         x = round(np.random.uniform(0, cf.area), 2)
         y = round(np.random.uniform(0, cf.area), 2)
-        nodes.append([i, 0.5, x, y, cf.distMax, 0, 0, 0, 0, 0])       # formato do nó: [id, bat, x, y, dch, count_dch, ddt, count_ddt]
+        nodes.append([i, 0.5, x, y, cf.distMax, 0, 0, 0, 0, 0, [], []])       # formato do nó: [id, bat, x, y, dch, count_dch, ddt, count_ddt, inter, buffer, cluster]
     
     return nodes
 

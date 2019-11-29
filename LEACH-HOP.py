@@ -140,7 +140,7 @@ for modoOp in modosHop:
                     k[1] = gastoRx(k[1],tamPacoteConfig)
 
                 if(nodes != []):
-                    # RECEPÇÃO    NCH: Recepção dos Pacotes de Bradcast
+                    # RECEPÇÃO NCH: Recepção dos Pacotes de Bradcast
                     for k in nodes:
                         menorDistancia = k[4]
                         nodeMenorDistancia = []
@@ -164,7 +164,7 @@ for modoOp in modosHop:
                                 nodeCH[8].append(node)
                         k[1] = gastoTx(k[1],k[4],tamPacoteConfig)
 
-                    # RECEPÇÃO     CH: Recepção de Pacotes de Resposta
+                    # RECEPÇÃO CH: Recepção de Pacotes de Resposta
                     for k in CH:
                         # Nodes atribuídos na função anterior
                         for l in range( len(k[8]) ):

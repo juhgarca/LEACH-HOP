@@ -159,40 +159,81 @@ for modoOp in modosHop:
             totalFramesExecutados = 0
 
             if(len(CH) != 0):
-            
-            print("CHs se anunciam")
-            # TRANSMISSÃO  CH: Envio do Broadcast
+                print("CHs se anunciam")
+                # TRANSMISSÃO  CH: Envio do Broadcast
                 pacotesBroadcast = []
-                for k in CH:
-                    pacotesBroadcast.append( [k[0],k[2],k[3],0.0,k[9]] )
+                for ch in CH:
+                    pacotesBroadcast.append([ch[0], ch[2], ch[3], 0.0, ch[9]])
                     # Registro da BS para envio
-                    k[7].append(BS)
-                    k[1] = gastoTx(k[1],k[4],tamPacoteConfig)
-            print("NCHs se associam")
-            print("Chs enviam TDMA")
-            print("NCHs calculaDTDC()\n")
+                    ch[10].append(BS)
+                    ch[1] = gastoTx(ch[1],ch[4],tamPacoteConfig)
 
-            frames_ctrl = 1
-            while frames_ctrl <= num_frames:
-                print("--> Frame", frames_ctrl)
-                print("     NCHs enviam dados para CHs")
-                print("     CHs agregam dados")
-                print("     CHs enviam dados para BS")
+                # RECEPÇÃO CH: Chs recebem o broadcast dos outros CHs
+                for ch in CH:
+                    for node in pacotesBroadcast:
+                        if(node[0] != ch[0]):
+                            ch[10].append(node)
+                    ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-                frames_ctrl += 1
-            
-            horizon_ctrl += 1
-            if horizon_ctrl == horizon: horizon_ctrl = 0
-            
-            print(">>>>>>>>> FIM DO ROUND", Round, "\n")
-            
-            #Controle do contador do Dch
-            for n in nodes:
-                if n[6] < n[5]:
-                    n[6] +=1
-                elif n[6] == n[5]:
-                    print("Reset count")
-                    n[6] = 1
+                if(nodes != []):
+                    # RECEPÇÃO NCH: Recepção dos Pacotes de Bradcast
+                    for n in nodes:
+                        menorDistancia = n[4]
+                        nodeMenorDistancia = []
+                        # Escolha do CH (o mais próximo)
+                        for nodeCH in pacotesBroadcast:
+                            dist = distancia(n[2], n[3], nodeCH[1], nodeCH[2])
+                            if(dist < menorDistancia):
+                                menorDistancia = dist
+                                nodeMenorDistancia = nodeCH
+                        # Atualização dos valores
+                        n[10] = [ nodeMenorDistancia ]
+                        n[4] = menorDistancia
+                        n[1] = gastoRx(n[1], tamPacoteConfig)
+                
+                    print("NCHs se associam")
+                    # TRANSMISSÃO NCH: Envio de Pacotes Resposta
+                    for n in nodes:
+                        node = [n[0], n[2], n[3], n[4], 0]
+                        # localiza o CH escolhido na lista de CH e coloca seu node em ListCL do CH
+                        for nodeCH in CH:
+                            if(n[10][0][0] == nodeCH[0]):
+                                nodeCH[11].append(node)
+                        n[1] = gastoTx(n[1], n[4], tamPacoteConfig)
+
+                    # RECEPÇÃO CH: Recepção de Pacotes de Resposta
+                    for ch in CH:
+                        # Nodes atribuídos na função anterior
+                        for l in range(len(ch[11])):
+                            ch[1] = gastoRx(ch[1], tamPacoteConfig)
+
+
+                    print("Chs enviam TDMA")
+
+                    
+                print("NCHs calculaDTDC()\n")
+
+                frames_ctrl = 1
+                while frames_ctrl <= num_frames:
+                    print("--> Frame", frames_ctrl)
+                    print("     NCHs enviam dados para CHs")
+                    print("     CHs agregam dados")
+                    print("     CHs enviam dados para BS")
+
+                    frames_ctrl += 1
+                
+                horizon_ctrl += 1
+                if horizon_ctrl == horizon: horizon_ctrl = 0
+                
+                print(">>>>>>>>> FIM DO ROUND", Round, "\n")
+                
+                #Controle do contador do Dch
+                for n in nodes:
+                    if n[6] < n[5]:
+                        n[6] +=1
+                    elif n[6] == n[5]:
+                        print("Reset count")
+                        n[6] = 1
             
             Round += 1
     
