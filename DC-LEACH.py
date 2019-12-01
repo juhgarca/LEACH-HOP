@@ -207,8 +207,65 @@ for modoOp in modosHop:
                         for l in range(len(ch[11])):
                             ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-
                     print("Chs enviam TDMA")
+                    # TRANSMISSÃO CH: Envio da Tabela TDMA
+                    ajuste_alcance_nodeCH(CH)
+                    clusters = []
+                    for ch in CH:
+                        clusters.append( [ch[0], setorizacao(ch[11], qtdSetores)] )
+                        ch[1] = gastoTx(ch[1],ch[4], tamPacoteConfig)
+
+                    # RECEPÇÃO NCH: Recepção da Tabela TDMA
+                    for n in nodes:
+                        idCH = k[10][0][0]
+                        # Localiza o cluster do CH
+                        for ch in clusters:
+                            if(ch[0] == idCH):
+                                n[11] = ch[1]
+                        n[1] = gastoRx(n[1], tamPacoteConfig)
+
+                    # CONFIGURAÇÃO DE RADIO DOS CH PARA ALCANÇAR A BS
+                    for ch in CH:
+                        ch[4] = distancia(ch[2], ch[3], BS[1], BS[2])
+
+                    # MULTI-HOP INTRACLUSTER
+                    if(intraCluster == 1):
+                        for n in nodes:
+                            # Acho o setor dentro do clusters
+                            setor = 0
+                            for node in n[11]:
+                                if(n[0] == node[0]):
+                                    setor = node[4]
+                                    break
+                            # Achar node vizinho mais proximo
+                            id = n[10][0][0]
+                            menor = n[4]
+                            for node in n[11]:
+                                dist = distancia(n[2], n[3], node[1], node[2])
+                                if(dist < menor and node[4] < setor):
+                                    id = node[0]
+                                    menor = dist
+                            k[10] = [[id, 0, 0, menor, 0]]
+                            k[4] = menor
+
+                    # MULTI-HOP INTERCLUSTER
+                    if(interCluster == 1):
+                        for ch in CH:
+                            menor = ch[4]
+                            for node in ch[10]:
+                                dist = distancia(ch[2], ch[3], node[1], node[2])
+                                if(dist < menor and node[4] < ch[9]):
+                                    menor = dist
+                                    ch[4] = menor
+                                    ch[7] = [node]
+
+                    # MAPEAMENTO DE ENCAMINHAMENTO NCH (Ids de destino dos nodes)
+                    mapaEncaminhamento = []
+                    for n in nodes:
+                        mapaEncaminhamento.append( n[10][0][0] )
+
+
+                    # --------------- parei aqui --------------------
 
                     
                 print("NCHs calculaDTDC()\n")
