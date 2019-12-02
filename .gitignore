@@ -1,5 +1,6 @@
 __pycache__
-.spyproject
+.vscode/settings.json
+settings.json
 Traces CRAWDAD/SetupA.txt
 Traces CRAWDAD/SetupB.txt
 Traces CRAWDAD/SetupC.txt
