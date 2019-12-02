@@ -1,3 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\Juh Yuki\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
+    "python.pythonPath": "C:\\Users\\Juliana\\wsn\\wsnenv\\Scripts\\python.exe",
+    "editor.wordWrap": "on",
+    "editor.minimap.enabled": false
 }
