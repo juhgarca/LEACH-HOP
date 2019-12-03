@@ -58,7 +58,7 @@ def ajuste_alcance_nodeCH(CH):
   for nodeCH in CH:
     maior = 0
     # Verifica os elementos do cluster
-    for node in nodeCH[8]:
+    for node in nodeCH[11]:
       if(maior < node[3]):
         maior = node[3]
     # Escolhe a maior distância e configura o rádio

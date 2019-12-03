@@ -7,7 +7,7 @@ Created on Thu Oct  3 08:18:15 2019
 from energySource import prediction, harvest
 import math
 import numpy as np
-from utils import generateNodes, gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH, verifica_eleitos
+from utils import generateNodes, gerarCenario, gastoRx, gastoTx, ajuste_alcance_nodeCH, checaBateria, contEncaminhamento, desvio_padrao, distancia, localizaObjetoCH, setorizacao, setorizacaoCH
 from config import *
 
 
@@ -83,7 +83,7 @@ def calculaDTDC(Dch):
     return Ddt, count
 
 
-#########################################################################################
+##################################################################################
 
 CH = []
 Round = 1
@@ -221,7 +221,7 @@ for modoOp in modosHop:
 
                     # RECEPÇÃO NCH: Recepção da Tabela TDMA
                     for n in nodes:
-                        idCH = k[10][0][0]
+                        idCH = n[10][0][0]
                         # Localiza o cluster do CH
                         for ch in clusters:
                             if(ch[0] == idCH):
@@ -281,19 +281,25 @@ for modoOp in modosHop:
                         # NCH: Transmite Pacote
                         for n in nodes:
                             if n[8] == 1:
-                                if(intraCluster == 1):
-                                    # Gasto de agregação de dados
-                                    totalContEnc = contEncaminhamento(n[0], mapaEncaminhamento)
-                                    if(totalContEnc > 0):
-                                        n[1] = n[1] - (0.000000005*payload*(totalContEnc + 1))
-                                n[1] = gastoTx(n[1], n[4], payload)
+                                if n[2] >= ener_nch_round:
+                                    print(n[0], "---------- sending data...")
+                                    if(intraCluster == 1):
+                                        # Gasto de agregação de dados
+                                        totalContEnc = contEncaminhamento(n[0], mapaEncaminhamento)
+                                        if(totalContEnc > 0):
+                                            n[1] = n[1] - (0.000000005*payload*(totalContEnc + 1))
+                                    n[1] = gastoTx(n[1], n[4], payload)
+                                else:
+                                    n[8] = 0
+                                    print(n[0], "---------- can't send data now")
+
                     
                         # CH: Recebe Pacote
                         for ch in CH:
                             for l in range( contEncaminhamento(ch[0], mapaEncaminhamento) ):
                                 ch[1] = gastoRx(ch[1], payload)
                         
-                        # NCH: Recebe Pacote  # <--------------- QUE DIABOS DE RECEPÇÃO É ESSA DE NOVO?!?!
+                        # NCH: Recebe Pacote  # <--------------- Intra-cluster !!!! não deveria ser antes do CH receber??
                         if(intraCluster == 1):
                             for n in nodes:
                                 for l in range( contEncaminhamento(n[0], mapaEncaminhamento) ):
@@ -309,14 +315,18 @@ for modoOp in modosHop:
                                 ch[1] = ch[1] - (0.000000005*payload*(totalContEnc + 1))
                             node = ch
                             idDestino = node[10][0][0]
+                            print("==========> ", idDestino)
                             while(idDestino != 0):
-                                node[1] = gastoTx(node[1],node[4], payload)
-                                node = localizaObjetoCH(idDestino,CH)
+                                print("infinite loop??")
+                                node[1] = gastoTx(node[1], node[4], payload)
+                                node = localizaObjetoCH(idDestino, CH)
                                 # Gasto Recepção do node destino
                                 node[1] = gastoRx(node[1], payload)
                                 idDestino = node[10][0][0]
+                                print("==========>>> ", idDestino)
+                                break
                             node[1] = gastoTx(node[1], node[4], payload)
-                            if(node[1] >= 0):
+                            if(node[1] >= 0):   # <----------------------- Que é que tem a ver?!
                                 # Confirma que houve um envio a BS
                                 confirmaFrame += 1
 
@@ -332,40 +342,39 @@ for modoOp in modosHop:
                         if(confirmaFrame > 0):
                             totalFramesExecutados += 1
                         
-                # Encerramento do Round
-                bat = list()
-                for ch in CH:
-                    nodes.append(ch)
-                for n in nodes:  # <--------------- Reseta valores
-                    n[4] = distMax
-                    n[10] = []
-                    n[11] = []
-                    bat.append({n[0]: n[1]})
+            # Encerramento do Round
+            bat = list()
+            for ch in CH:
+                nodes.append(ch)
+            for n in nodes:  # <--------------- Reseta valores
+                n[4] = distMax
+                n[10] = []
+                n[11] = []
+                bat.append({n[0]: n[1]})
 
-                #Exclui zerados
-                checaBateria(nodes)
+            #Exclui zerados
+            checaBateria(nodes)
 
-                nosVivos.append(len(nodes))
-                resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
-                #print('Simulação: ' + str(simulacao) + ' Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n')
-                #arquivo.write(resultados)
-                
-                horizon_ctrl += 1
-                if horizon_ctrl == horizon: horizon_ctrl = 0
+            nosVivos.append(len(nodes))
+            resultados = 'Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n'
+            #print('Simulação: ' + str(simulacao) + ' Round: ' + str(Round) + ' #Nós Vivos: ' + str(len(nodes)) + '\n')
+            arquivo.write(resultados)
+            
+            horizon_ctrl += 1
+            if horizon_ctrl == horizon: horizon_ctrl = 0
 
-                CH = []
-                Round = Round + 1
-                print("Round", Round-1, "Nós vivos: ", len(nodes))
-                
-                print(">>>>>>>>> FIM DO ROUND", Round, "\n")
-                
-                #Controle do contador do Dch
-                for n in nodes:
-                    if n[6] < n[5]:
-                        n[6] +=1
-                    elif n[6] == n[5]:
-                        print("Reset count")
-                        n[6] = 1
+            CH = []
+            print("Round", Round, "Nós vivos: ", len(nodes))
+            
+            print(">>>>>>>>> FIM DO ROUND", Round, "\n")
+            
+            #Controle do contador do Dch
+            for n in nodes:
+                if n[6] < n[5]:
+                    n[6] +=1
+                elif n[6] == n[5]:
+                    print("Reset count")
+                    n[6] = 1
             
             Round += 1
             # FIM DE UM ROUND ##########
@@ -375,10 +384,10 @@ for modoOp in modosHop:
         #print('Simulacao ' + str(simulacao+1) + ": " + str(Round))
         #roundsSimulacao.append(Round-1)
 
-        resultados = 'Simulacao: ' + str(simulacao) + ' Rounds: ' + str(Round-1) + ' Nos Vivos: ' + str(len(nodes)) + '\n'
+        #resultados = 'Simulacao: ' + str(simulacao) + ' Rounds: ' + str(Round-1) + ' Nos Vivos: ' + str(len(nodes)) + '\n'
         #arquivo.write(resultados)
 
-    # Estatísticas
+        # Estatísticas
 
-arquivo.close()
-#arquivo_bat.close()
+        arquivo.close()
+        #arquivo_bat.close()
