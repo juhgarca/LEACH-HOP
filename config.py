@@ -69,7 +69,7 @@ pwr_rx = 0.0222    # W
 pwr_ch_tx = 0.0267    # W (valor aproximado para a primeira vez, já que não tem como calcular)
 packet_rate = 0.5     # pacotes/s
 
-energy = 0.5*0.000154*0.22*200
+energy = 0.5*0.000154*0.22*400
 
 ener_max_tx = pwr_max_tx * timeslot
 ener_rx = pwr_rx * timeslot
