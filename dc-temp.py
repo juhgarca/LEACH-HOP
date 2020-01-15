@@ -98,7 +98,8 @@ roundsSimulacao = []
 Round = 1
 totalRounds = 0
 nodes = generateNodes()
-arquivo = open('novo-arquivo.txt', 'w')
+arquivo_setup = open('log_setup_phase.txt', 'w')
+arquivo_data = open('log_dt_phase.txt', 'w')
 nosVivos = list()
 
 while Round <= 20:  # <------------------------- Início da Simulação
@@ -107,10 +108,11 @@ while Round <= 20:  # <------------------------- Início da Simulação
         harv_pwr = prediction(Round)
         #ener_r_har = qtdNodes*harv_pwr            # Joules
         ener_r_har = qtdNodes*energy*round_length*timeslot
-        print(">>>>>>>>>>>>", ener_r_har)
+        arquivo_setup.write("Round "+ str(Round) + " - Ener_har "+ str(ener_r_har) + ": ")
         
         for n in nodes: # <--------------------- Cálculo do Dch
-            n[4], n[5], k = calculaCHDC(ener_r_har)
+            n[5], n[6], k = calculaCHDC(ener_r_har)
+            arquivo_setup.write("["+ str(n[0]) +", "+ str(n[5]) +", " + str(n[6]) + "] ")
 
     num_frames = round_length*k/qtdNodes
     cluster_len = qtdNodes/k
@@ -120,23 +122,22 @@ while Round <= 20:  # <------------------------- Início da Simulação
     ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx      # Joules
 
     print(">>>>>>>>> INÍCIO DO ROUND", Round)
-    arquivo.write("Round "+ str(Round) + ": ")
+    arquivo_data.write("Round "+ str(Round) + ": ")
 
-    eh = harvest(Round)     # <------------------- Captura de energia
+    """eh = harvest(Round)     # <------------------- Captura de energia
     for n in nodes:
         n[1] += eh
-        if n[1] >= 5.0: n[1] = 5.0
+        if n[1] >= 5.0: n[1] = 5.0"""
 
     for n in nodes:         # <------------------- "Seleção" de CH
         if n[6] == 1:
             if n[2] >= ener_ch_round:
                 CH.append(n)
                 print(n[0], " SOU CH")
-                arquivo.write(str(n[0])+ " | ")
             else:
                 n[6] = 0
                 print(n[0], "recharging...")
-    arquivo.write("\n")
+    arquivo_setup.write("\nCHs ("+ str(len(CH))+ "): " + str(np.array(CH)[:,0])+ "\n")
 
     # Conta os frames que foram executados
     totalFramesExecutados = 0
