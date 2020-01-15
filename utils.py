@@ -31,6 +31,12 @@ def distancia(x1,y1,x2,y2):
 def gastoTx(bateria, distancia, tamPacote):
    return bateria-(0.00000005*tamPacote + 0.0000000001*tamPacote*(distancia*distancia))
 
+def sendMsg(tipo, origem):
+    if tipo == 'ANNOUNCE_CH':
+        if origem[1] >= gastoTx(origem[1], origem[4], 300):
+            #contaPacotesEnviados += 1
+            meio.append([origem[0], 'bcast', 'Sou CH', 'config'])
+
 def gastoRx(bateria, tamPacote):
    return bateria - 0.00000005 * tamPacote
 
