@@ -86,14 +86,12 @@ def calculaDTDC(Dch):
 ##################################################################################
 
 CH = []
-Round = 1
 horizon_ctrl = 0
 qtdSetores = 2
 qtdFrames = 10
 
 framesSimulacao = []  # <<<<<<<<<<< ATENTION!!!
 roundsSimulacao = []
-
 
 Round = 1
 totalRounds = 0
@@ -139,12 +137,12 @@ while Round <= 20:  # <------------------------- Início da Simulação
                 print(n[0], "recharging...")
     arquivo_setup.write("\nCHs ("+ str(len(CH))+ "): " + str(np.array(CH)[:,0])+ "\n")
 
-    # Conta os frames que foram executados
+    # Conta os frames que foram executados     PRA QUÊ?
     totalFramesExecutados = 0
 
     if(len(CH) != 0):
         print("CHs se anunciam")
-        # TRANSMISSÃO  CH: Envio do Broadcast
+        # TRANSMISSÃO CH: Envio do Broadcast
         pacotesBroadcast = []
         for ch in CH:
             pacotesBroadcast.append([ch[0], ch[2], ch[3], 0.0, ch[9]])
