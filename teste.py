@@ -89,12 +89,12 @@ while Round <= 2:  # <------------------------- Início da Simulação
         # TRANSMISSÃO CH: Envio do Broadcast
         for ch in CH:   # <------------ Envio de cada CH
             ch[1] = gastoTx(ch[1], ch[4], tamPacoteConfig)
+            for n in nodes: # <-------- NCHs recebem mensagens
+                n[11].append( [ch[0], ch[2], ch[3]] )
+                n[1] = gastoRx(n[1], tamPacoteConfig)
+                arquivo_setup.write("\n\n"+ str(n[0]) + ">>"+ n[11]+"\n")
             for i in range(1, len(CH)): # <----------- Recebe mensagens dos outros CHs
                 ch[1] = gastoRx(ch[1], tamPacoteConfig)
-
-        for n in nodes: # <------------ NCHs recebem mensagens
-            for i in range(1, len(CH)):
-                n[1] = gastoRx(n[1], tamPacoteConfig)
 
         # NCHs se associam a um CH
         
