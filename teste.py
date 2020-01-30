@@ -76,6 +76,7 @@ while Round <= 2:  # <------------------------- Início da Simulação
         if n[6] == 1:
             if n[2] >= ener_ch_round:
                 CH.append(n)
+                nodes.remove(n)
                 print(n[0], " SOU CH")
             else:
                 n[6] = 0
@@ -91,8 +92,12 @@ while Round <= 2:  # <------------------------- Início da Simulação
             for i in range(1, len(CH)): # <----------- Recebe mensagens dos outros CHs
                 ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-        ##### TO-DO Recepção NCHs
+        for n in nodes: # <------------ NCHs recebem mensagens
+            for i in range(1, len(CH)):
+                n[1] = gastoRx(n[1], tamPacoteConfig)
 
+        # NCHs se associam a um CH
+        
 
 
     # ENCERRAMENTO DO ROUND
