@@ -3,6 +3,7 @@ from energySource import prediction, harvest
 from utils import generateNodes, gastoTx, gastoRx
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 def calculaOCHP(ener_r_har):
 
@@ -49,7 +50,7 @@ nodes = generateNodes()
 
 arquivo_setup = open('log_setup_phase.txt', 'w')
 
-while Round <= 2:  # <------------------------- Início da Simulação
+while Round < 2:  # <------------------------- Início da Simulação
 
     CH = []
 
@@ -92,12 +93,36 @@ while Round <= 2:  # <------------------------- Início da Simulação
             for n in nodes: # <-------- NCHs recebem mensagens
                 n[11].append( [ch[0], ch[2], ch[3]] )
                 n[1] = gastoRx(n[1], tamPacoteConfig)
-                arquivo_setup.write("\n\n"+ str(n[0]) + ">>"+ n[11]+"\n")
             for i in range(1, len(CH)): # <----------- Recebe mensagens dos outros CHs
                 ch[1] = gastoRx(ch[1], tamPacoteConfig)
+        
+        arquivo_setup.write("\n\n"+ str(nodes[0][0]) + ">>"+ str(nodes[0][11])+"\n\n")
 
         # NCHs se associam a um CH
+        for n in nodes:
+            closer_dist = n[4]
+            arquivo_setup.write("Node "+ str(n[0])+ ": ")
+            for ch in n[11]:
+                dist = distancia(n[2], n[3], ch[1], ch[2])
+                arquivo_setup.write(str(round(dist, 3))+ " - ")
+                if dist <= closer_dist:
+                    closer_dist = dist
+                    closer_node = ch[0]
+            n[4] = closer_dist      # <---------- Reduz o alcance do radio
+            n[11] = closer_node     # <---------- CH escolhido
+            arquivo_setup.write("CH: "+ str(n[11])+ " ("+str(round(n[4], 3))+"m)\n")
+
+            for ch in CH:
+                if n[11] == ch[0]:
+                    ch[11].append(n[0])
         
+        for ch in CH:
+            arquivo_setup.write("Cluster "+ str(ch[0])+ ": "+str(ch[11])+"\n")
+
+        
+
+        
+
 
 
     # ENCERRAMENTO DO ROUND
