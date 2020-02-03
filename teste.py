@@ -3,6 +3,7 @@ from energySource import prediction, harvest
 from utils import generateNodes, gastoTx, gastoRx
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 def calculaOCHP(ener_r_har):
 
@@ -41,6 +42,35 @@ def calculaCHDC(ener_har):
     return Dch, count, kopt
 
 
+def calculaDTDC(Dch):
+
+    print("Calculando duty-cycle de transmissão de dados")
+    num_nch_rounds = horizon - (horizon/Dch)
+    ener_rem_nch = (harv_pwr*horizon - ener_ch_round*(horizon-num_nch_rounds))/ num_nch_rounds
+    
+    pt1 = (ener_ch_tx*num_frames)/ener_rem_nch
+    if (pt1 >= 1 and pt1 <= num_frames):
+       Dene_dt = math.ceil(pt1)
+    else:
+        Dene_dt = 1
+    
+    pt2 = num_frames/(packet_rate*round_time)
+    if (pt2 >= 1 and pt2 <= num_frames):
+        Ddata_dt = math.floor(pt2)
+    else:
+        Ddata_dt = 1
+    
+    dtdc = max(Dene_dt, Ddata_dt)
+    if (dtdc > num_frames):
+        Ddt = 0
+    elif (dtdc >= 1 and dtdc <= num_frames):
+        Ddt = dtdc
+
+    count = np.random.randint(1, Ddt+1)
+    
+    return Ddt, count
+
+
 #############################################################################
 
 Round = 1
@@ -49,9 +79,10 @@ nodes = generateNodes()
 
 arquivo_setup = open('log_setup_phase.txt', 'w')
 
-while Round <= 2:  # <------------------------- Início da Simulação
+while Round < 2:  # <------------------------- Início da Simulação
 
     CH = []
+    frame = 1
 
     if horizon_ctrl == 0:   # <----------------- Controle do horizonte de predição
         harv_pwr = prediction(Round)
@@ -76,6 +107,7 @@ while Round <= 2:  # <------------------------- Início da Simulação
         if n[6] == 1:
             if n[2] >= ener_ch_round:
                 CH.append(n)
+                nodes.remove(n)
                 print(n[0], " SOU CH")
             else:
                 n[6] = 0
@@ -88,10 +120,75 @@ while Round <= 2:  # <------------------------- Início da Simulação
         # TRANSMISSÃO CH: Envio do Broadcast
         for ch in CH:   # <------------ Envio de cada CH
             ch[1] = gastoTx(ch[1], ch[4], tamPacoteConfig)
+            for n in nodes: # <-------- NCHs recebem mensagens
+                n[11].append( [ch[0], ch[2], ch[3]] )
+                n[1] = gastoRx(n[1], tamPacoteConfig)
             for i in range(1, len(CH)): # <----------- Recebe mensagens dos outros CHs
                 ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-        ##### TO-DO Recepção NCHs
+        # NCHs se associam a um CH
+        for n in nodes:
+            closer_dist = n[4]
+            for ch in n[11]:
+                dist = distancia(n[2], n[3], ch[1], ch[2])
+                if dist <= closer_dist:
+                    closer_dist = dist
+                    closer_node = ch[0]
+            n[4] = closer_dist      # <---------- Reduz o alcance do radio
+            n[11] = closer_node     # <---------- CH escolhido
+
+            # Envia mensagem para o CH escolhido
+            n[1] = gastoTx(n[1], n[4], tamPacoteConfig)
+            for ch in CH:
+                if n[11] == ch[0]:
+                    ch[11].append( [n[0], n[2], n[3]])  # <------ Guarda id e posição dos nós
+                    ch[1] = gastoRx(ch[1], tamPacoteConfig)
+
+        """#### TO-DO: plotar gráfico dos clusters
+        chs = []
+        for ch in CH:
+            arquivo_setup.write("Cluster "+ str(ch[0])+ ": "+str(ch[11])+"\n")
+            chs.append(ch[0])"""
+        
+        # CHs reduzem o alcance do radio e enviam tabela TDMA
+        for ch in CH:
+            farther = 0
+            for c in ch[11]:
+                dist = distancia(ch[2], ch[3], c[1], c[2])
+                if dist >= farther:
+                    farther = dist
+            ch[4] = farther
+            ch[1] = gastoTx(ch[1], ch[4], tamPacoteConfig)  # <-------- Envio TDMA
+
+        arquivo_setup.write("\nDT-DC: ")
+        # NCHs recebem tabela TDMA e calculam Ddt
+        for n in nodes:
+            n[1] = gastoRx(n[1], tamPacoteConfig)
+            n[7], n[8] = calculaDTDC(n[5])
+            arquivo_setup.write("["+ str(n[0]) +", "+ str(n[7]) +", " + str(n[8]) + "] ")
+
+        ### INÍCIO DA FASE DE TRANSMISSÃO DE DADOS ###
+        while frame <= num_frames:
+
+            for n in nodes:
+                if n[8] == 1:
+                    if n[2] >= ener_nch_round: # <<< ATENTION!!! 
+                        ### TO-DO
+                        print(n[0], "envia msgs")
+                    else:
+                        n[6] = 0
+                        print(n[0], "recharging...")
+            
+
+
+            #Controle do contador do Ddt
+            for n in nodes:
+                if n[8] < n[7]:
+                    n[8] +=1
+                elif n[8] == n[7]:
+                    print("Reset count")
+                    n[8] = 1
+
 
 
 
@@ -106,6 +203,8 @@ while Round <= 2:  # <------------------------- Início da Simulação
     horizon_ctrl += 1
     if horizon_ctrl == horizon: horizon_ctrl = 0
 
+
+
     #Controle do contador do Dch
     for n in nodes:
         if n[6] < n[5]:
@@ -116,6 +215,3 @@ while Round <= 2:  # <------------------------- Início da Simulação
     
     Round += 1
     # FIM DE UM ROUND ##########
-
-
-
