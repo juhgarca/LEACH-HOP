@@ -40,6 +40,9 @@ def sendMsg(tipo, origem):
 def gastoRx(bateria, tamPacote):
    return bateria - 0.00000005 * tamPacote
 
+def gastoAgg(bateria, numNchCluster):
+    return bateria - (0.00001*(numNchCluster))
+
 def contEncaminhamento(id,listaID):
     cont = 0
     for k in listaID:

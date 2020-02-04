@@ -1,6 +1,6 @@
 from config import *
 from energySource import prediction, harvest
-from utils import generateNodes, gastoTx, gastoRx
+from utils import generateNodes, gastoTx, gastoRx, gastoAgg
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -78,10 +78,12 @@ horizon_ctrl = 0
 nodes = generateNodes()
 
 arquivo_setup = open('log_setup_phase.txt', 'w')
+arquivo_transm = open('log_dt_phase', 'w')
 
 while Round < 2:  # <------------------------- Início da Simulação
 
     CH = []
+    sleep_nodes = []
     frame = 1
 
     if horizon_ctrl == 0:   # <----------------- Controle do horizonte de predição
@@ -115,6 +117,13 @@ while Round < 2:  # <------------------------- Início da Simulação
     arquivo_setup.write("\nCHs ("+ str(len(CH))+ "): " + str(np.array(CH)[:,0])+ "\n")
 
     if(len(CH) != 0):   # <------------ Controle pro caso de nenhum nó ser CH no round
+
+        # NCHs calculam o Ddt
+        n[7], n[8] = calculaDTDC(n[5])
+        for n in nodes:
+            if n[7] == 0:   # <---------- Se Ddt = 0, permanece em silêncio por todo o round
+                sleep_nodes.append(n)
+                nodes.remove(n)
 
         print("CHs se anunciam")
         # TRANSMISSÃO CH: Envio do Broadcast
@@ -161,32 +170,37 @@ while Round < 2:  # <------------------------- Início da Simulação
             ch[1] = gastoTx(ch[1], ch[4], tamPacoteConfig)  # <-------- Envio TDMA
 
         arquivo_setup.write("\nDT-DC: ")
-        # NCHs recebem tabela TDMA e calculam Ddt
+
+        # NCHs recebem tabela TDMA
         for n in nodes:
             n[1] = gastoRx(n[1], tamPacoteConfig)
-            n[7], n[8] = calculaDTDC(n[5])
             arquivo_setup.write("["+ str(n[0]) +", "+ str(n[7]) +", " + str(n[8]) + "] ")
+        arquivo_setup.write("\nDdts ("+ str(len(nodes))+ "): " + str(np.array(nodes)[:,0])+ "\n")
 
         ### INÍCIO DA FASE DE TRANSMISSÃO DE DADOS ###
+        arquivo_transm.write("Total frames: "+str(num_frames)+"\n")
         while frame <= num_frames:
 
+            arquivo_transm.write("\nFrame "+str(frame)+": ")
+            # NCHs enviam dados
             for n in nodes:
                 if n[8] == 1:
-                    if n[2] >= ener_nch_round: # <<< ATENTION!!! 
-                        ### TO-DO
-                        print(n[0], "envia msgs")
-                    else:
-                        n[6] = 0
-                        print(n[0], "recharging...")
-            
+                    n[1] = gastoTx(n[1], n[4], tamPktTx)
+                    arquivo_transm.write(str(n[0])+"  ")
 
+            # CHs recebem, agregam e enviam mensagens para base
+            for ch in CH:
+                for n in ch[11]:
+                    ch[1] = gastoRx(ch[1], tamPktTx)
+                ch[1] = gastoAgg(ch[1], len(ch[11]))
+                ch[1] = gastoTx(ch[1], distMax, len(ch[11])/2*tamPktTx) # <---- tamanho do pacote agregado tirado da minha cabeça
 
             #Controle do contador do Ddt
             for n in nodes:
                 if n[8] < n[7]:
                     n[8] +=1
                 elif n[8] == n[7]:
-                    print("Reset count")
+                    print("Reset ddt count")
                     n[8] = 1
 
 
@@ -195,6 +209,8 @@ while Round < 2:  # <------------------------- Início da Simulação
     # ENCERRAMENTO DO ROUND
     for ch in CH:
         nodes.append(ch)
+    for node in sleep_nodes:
+        nodes.append(node)
     for n in nodes:  # <--------------- Reseta valores
         n[4] = distMax
         n[10] = []

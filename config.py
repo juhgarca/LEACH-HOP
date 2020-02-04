@@ -9,6 +9,7 @@ from utils import distancia
 totalSimulacoes = 1
 
 tamPacoteConfig = 300
+tamPktTx = 2000
 
 bat_init = 5.0
 
