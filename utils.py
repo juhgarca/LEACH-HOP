@@ -40,6 +40,9 @@ def sendMsg(tipo, origem):
 def gastoRx(bateria, tamPacote):
    return bateria - 0.00000005 * tamPacote
 
+def gastoAgg(bateria, numNchCluster):
+    return bateria - (0.00001*(numNchCluster))
+
 def contEncaminhamento(id,listaID):
     cont = 0
     for k in listaID:
@@ -125,9 +128,10 @@ def setorizacao(lista,divisor):
     return lista
 
 def checaBateria(nodes):
-    for k in nodes:
-        if(k[1] <= 0):
-            nodes.remove(k)
+    for n in nodes:
+        if(n[1] <= 0):
+            print("******* Nó", n[0], "descarregou (",n[1],")")
+            nodes.remove(n)
 
 def desvio_padrao(valores, media):
     soma = 0
