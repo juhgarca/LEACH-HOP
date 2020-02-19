@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 def calculaOCHP(ener_r_har):
 
-    print("Calculando porcentagem ótima de cluster heads")
     ener_r_net = 0
     kopt = 0
     for k in range(kmin, kmax+1):
@@ -28,7 +27,6 @@ def calculaOCHP(ener_r_har):
 
 def calculaCHDC(ener_har):
 
-    print("Calculando duty-cycle do cluster head")
     kopt = calculaOCHP(ener_har)
     pi = kopt/qtdNodes
     dcch = 1/pi
@@ -44,7 +42,6 @@ def calculaCHDC(ener_har):
 
 def calculaDTDC(Dch):
 
-    print("Calculando duty-cycle de transmissão de dados")
     num_nch_rounds = horizon - (horizon/Dch)
     ener_rem_nch = (harv_pwr*horizon - ener_ch_round*(horizon-num_nch_rounds))/ num_nch_rounds
     
@@ -81,7 +78,11 @@ arquivo_setup = open('log_setup_phase.txt', 'w')
 arquivo_transm = open('log_dt_phase', 'w')
 arquivo_batt = open('bateria.csv', 'w')
 
-while Round < 2:  # <------------------------- Início da Simulação
+arquivo_batt.write("CONSUMO ")
+for n in nodes:
+    arquivo_batt.write(str(n[0])+" ")
+
+while Round < 5:  # <------------------------- Início da Simulação
 
     CH = []
     sleep_nodes = []
@@ -104,14 +105,19 @@ while Round < 2:  # <------------------------- Início da Simulação
     ener_ch_round = num_frames * (ener_max_tx + (cluster_len-1)*ener_rx + ener_agg) + ener_setup     # Joules
     ener_nch_round = num_frames * (cluster_len-1) * ener_ch_tx      # Joules
 
+    print("\nNumero de frames:", num_frames, "\nk = ", k, "\nTamanho do round: ", round_length, "\n")
+
     # INÍCIO DO ROUND
 
     checaBateria(nodes)
+
+    arquivo_batt.write("\nInicio_round_"+str(Round)+" ")
 
     # Nós recebem energia do ambiente
     for n in nodes:
         n[1] += energy*round_length*timeslot
         if n[1] > 5.0: n[1] = 5.0
+        arquivo_batt.write(str(n[1])+" ")
 
     # Seleção dos nós que serão CH no round
     for n in nodes:
@@ -124,8 +130,6 @@ while Round < 2:  # <------------------------- Início da Simulação
                 n[6] = 0
                 print(n[0], "recharging...")
 
-    arquivo_batt.write("CONSUMO "+ str(np.array(CH)[:,0])[1:-1]+"\n")
-    
     arquivo_setup.write("\nCHs ("+ str(len(CH))+ "): " + str(np.array(CH)[:,0])+ "\n")
 
     checaBateria(nodes)
@@ -150,8 +154,6 @@ while Round < 2:  # <------------------------- Início da Simulação
             for i in range(1, len(CH)): # <----------- Recebe mensagens dos outros CHs
                 ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-        arquivo_batt.write("Tx-Rx_bcast "+ str(np.array(CH)[:,1])[1:-1]+"\n")
-
         # NCHs se associam a um CH
         for n in nodes:
             closer_dist = n[4]
@@ -170,39 +172,30 @@ while Round < 2:  # <------------------------- Início da Simulação
                     ch[11].append( [n[0], n[2], n[3]])  # <------ Guarda id e posição dos nós
                     ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-        arquivo_batt.write("Rx_nch "+ str(np.array(CH)[:,1])[1:-1]+"\n")
-
         checaBateria(nodes)
         checaBateria(CH)
-
-        #### Gráfico dos clusters
-        """#Gráfico separando CHs e NCHs
-        chs_x = np.array(CH)[:,2]
-        chs_y = np.array(CH)[:,3]
-        nhcs_x = np.array(nodes)[:,2]
-        nhcs_y = np.array(nodes)[:,3]
-        plt.scatter(chs_x, chs_y, marker='^')
-        plt.scatter(nhcs_x, nhcs_y, marker='o')
-        plt.savefig('grafico_clusters.png', format='png')"""
         
-        #Gráfico separado por cluster
-        X, Y = [], []
-        colors = np.random.rand(len(CH)) #### !!! Erro aqui! Fazer um array de nomes de cores
+        #Gráfico dos clusters
+        chs_x, chs_y, X, Y = [], [], [], []
+        colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'orange', 'purple', 'olive', 'gray', 'pink', 'black', 'yellow', 'paleturquoise', 'chocolate', 'lightgreen']
         for ch in CH:
             x, y = [], []
-            x.append(ch[2])
-            y.append(ch[3])
+            chs_x.append(ch[2])
+            chs_y.append(ch[3])
             for node in ch[11]:
                 x.append(node[1])
                 y.append(node[2])
             X.append(x)
             Y.append(y)
         
-        for x, y, cor in zip(X, Y, colors):
+        
+        for x, y, ch_x, ch_y, cor in zip(X, Y, chs_x, chs_y, colors):
             plt.scatter(x, y, color=cor)
-        plt.savefig('grafico_clusters2.png', format='png')
+            plt.scatter(ch_x, ch_y, color=cor, marker='^', label=colors)
+        nome_grafico = "clusters_round_"+str(Round)+".png"
+        plt.savefig(nome_grafico, format='png')
 
-        """# CHs reduzem o alcance do radio e enviam tabela TDMA
+        # CHs reduzem o alcance do radio e enviam tabela TDMA
         for ch in CH:
             farther = 0
             for c in ch[11]:
@@ -212,7 +205,6 @@ while Round < 2:  # <------------------------- Início da Simulação
             ch[4] = farther
             ch[1] = gastoTx(ch[1], ch[4], tamPacoteConfig)  # <-------- Envio TDMA
 
-        arquivo_batt.write("Tx_tdma "+ str(np.array(CH)[:,1])[1:-1]+"\n")
         arquivo_setup.write("\nDT-DC: ")
 
         # NCHs recebem tabela TDMA
@@ -239,9 +231,7 @@ while Round < 2:  # <------------------------- Início da Simulação
                 for n in ch[11]:
                     ch[1] = gastoRx(ch[1], tamPktTx)
                 ch[1] = gastoAgg(ch[1], len(ch[11]))
-                ch[1] = gastoTx(ch[1], distMax, len(ch[11])/2*tamPktTx) # <---- tamanho do pacote agregado tirado da minha cabeça
-
-            arquivo_batt.write("Rx_data "+ str(np.array(CH)[:,1])[1:-1]+"\n")
+                ch[1] = gastoTx(ch[1], distMax, tamPktTx)
 
             checaBateria(nodes)
             checaBateria(CH)
@@ -276,7 +266,11 @@ while Round < 2:  # <------------------------- Início da Simulação
             n[6] +=1
         elif n[6] == n[5]:
             print("Reset count")
-            n[6] = 1"""
+            n[6] = 1
+    
+    arquivo_batt.write("\nFim_round_"+str(Round)+" ")
+    for n in nodes:
+        arquivo_batt.write(str(n[1])+ " ")
     
     Round += 1
     # FIM DE UM ROUND ##########
