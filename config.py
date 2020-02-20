@@ -79,10 +79,5 @@ ener_agg = 0.00001*(cluster_len-1)
 ener_setup = ener_max_tx + (cluster_len-1)*ener_rx + ener_nch_tx
 ener_ch_tx = ener_nch_tx    # W (valor aproximado para a primeira vez, já que não tem como calcular)
 
-
-
-
-
-
-
-
+tempo_simulacao = 5000  # segundos
+num_rounds = tempo_simulacao * round_time

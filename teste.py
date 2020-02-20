@@ -82,17 +82,19 @@ arquivo_batt.write("CONSUMO ")
 for n in nodes:
     arquivo_batt.write(str(n[0])+" ")
 
-while Round < 5:  # <------------------------- Início da Simulação
+while Round <= 1:  # <------------------------- Início da Simulação
 
     CH = []
     sleep_nodes = []
     frame = 1
 
+    arquivo_setup.write(">>> Round "+ str(Round))
+
     if horizon_ctrl == 0:   # <----------------- Controle do horizonte de predição
         harv_pwr = prediction(Round)
         #ener_r_har = qtdNodes*harv_pwr            # Joules
         ener_r_har = qtdNodes*energy*round_length*timeslot
-        arquivo_setup.write("Round "+ str(Round) + " - Ener_har "+ str(ener_r_har) + ": ")
+        arquivo_setup.write(" - Ener_har "+ str(ener_r_har) + "\nCH-DC: ")
         
         for n in nodes: # <--------------------- Cálculo do Dch
             n[5], n[6], k = calculaCHDC(ener_r_har)
@@ -138,8 +140,8 @@ while Round < 5:  # <------------------------- Início da Simulação
     if(len(CH) != 0):   # <------------ Controle pro caso de nenhum nó ser CH no round
 
         # NCHs calculam o Ddt
-        n[7], n[8] = calculaDTDC(n[5])
         for n in nodes:
+            n[7], n[8] = calculaDTDC(n[5])
             if n[7] == 0:   # <---------- Se Ddt = 0, permanece em silêncio por todo o round
                 sleep_nodes.append(n)
                 nodes.remove(n)
@@ -187,13 +189,13 @@ while Round < 5:  # <------------------------- Início da Simulação
                 y.append(node[2])
             X.append(x)
             Y.append(y)
-        
-        
+             
         for x, y, ch_x, ch_y, cor in zip(X, Y, chs_x, chs_y, colors):
             plt.scatter(x, y, color=cor)
             plt.scatter(ch_x, ch_y, color=cor, marker='^', label=colors)
         nome_grafico = "clusters_round_"+str(Round)+".png"
-        plt.savefig(nome_grafico, format='png')
+        plt.savefig("graficos/"+nome_grafico, format='png')
+        plt.clf()
 
         # CHs reduzem o alcance do radio e enviam tabela TDMA
         for ch in CH:
@@ -246,7 +248,6 @@ while Round < 5:  # <------------------------- Início da Simulação
 
             frame += 1
 
-
     # ENCERRAMENTO DO ROUND
     for ch in CH:
         nodes.append(ch)
@@ -271,6 +272,10 @@ while Round < 5:  # <------------------------- Início da Simulação
     arquivo_batt.write("\nFim_round_"+str(Round)+" ")
     for n in nodes:
         arquivo_batt.write(str(n[1])+ " ")
+
+    arquivo_setup.write("\n\n")
     
     Round += 1
     # FIM DE UM ROUND ##########
+
+print(len(nodes))
