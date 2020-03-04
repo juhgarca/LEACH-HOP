@@ -82,7 +82,7 @@ arquivo_batt.write("CONSUMO ")
 for n in nodes:
     arquivo_batt.write(str(n[0])+" ")
 
-while Round <= 1:  # <------------------------- Início da Simulação
+while Round <= 100:  # <------------------------- Início da Simulação
 
     CH = []
     sleep_nodes = []
@@ -91,9 +91,9 @@ while Round <= 1:  # <------------------------- Início da Simulação
     arquivo_setup.write(">>> Round "+ str(Round))
 
     if horizon_ctrl == 0:   # <----------------- Controle do horizonte de predição
-        harv_pwr = prediction(Round)
+        #harv_pwr = prediction(Round)
         #ener_r_har = qtdNodes*harv_pwr            # Joules
-        ener_r_har = qtdNodes*energy*round_length*timeslot
+        ener_r_har = harv_pwr = qtdNodes*energy*round_length*timeslot
         arquivo_setup.write(" - Ener_har "+ str(ener_r_har) + "\nCH-DC: ")
         
         for n in nodes: # <--------------------- Cálculo do Dch
@@ -116,8 +116,10 @@ while Round <= 1:  # <------------------------- Início da Simulação
     arquivo_batt.write("\nInicio_round_"+str(Round)+" ")
 
     # Nós recebem energia do ambiente
+    #eh = harvest(Round)
     for n in nodes:
         n[1] += energy*round_length*timeslot
+        #n[1] += eh
         if n[1] > 5.0: n[1] = 5.0
         arquivo_batt.write(str(n[1])+" ")
 
