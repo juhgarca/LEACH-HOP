@@ -3,6 +3,7 @@
 import math
 import numpy as np
 import config as cf
+import matplotlib.pyplot as plt
 
 
 def gerarCenario(qtdNodes,distMax):
@@ -20,7 +21,7 @@ def generateNodes():
     for i in range(1,cf.qtdNodes+1):
         x = round(np.random.uniform(0, cf.area), 2)
         y = round(np.random.uniform(0, cf.area), 2)
-        nodes.append([i, 0.5, x, y, cf.distMax, 0, 0, 0, 0, 0, [], []])       # formato do nó: [id, bat, x, y, dch, count_dch, ddt, count_ddt, inter, buffer, cluster]
+        nodes.append([i, 0.5, x, y, cf.distMax, 0, 0, 0, 0, 0, [], []])       # formato do nó: [id, bat, x, y, distMax, dch, count_dch, ddt, count_ddt, inter, buffer, cluster]
     
     return nodes
 
@@ -139,3 +140,23 @@ def desvio_padrao(valores, media):
         soma += math.pow( (valor - media), 2)
     return math.sqrt( soma / float( len(valores) ) )
 
+def grafico_clusters(CH, Round):
+
+    chs_x, chs_y, X, Y = [], [], [], []
+    colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'orange', 'purple', 'olive', 'gray', 'pink', 'black', 'yellow', 'paleturquoise', 'chocolate', 'lightgreen']
+    for ch in CH:
+        x, y = [], []
+        chs_x.append(ch[2])
+        chs_y.append(ch[3])
+        for node in ch[11]:
+            x.append(node[1])
+            y.append(node[2])
+        X.append(x)
+        Y.append(y)
+            
+    for x, y, ch_x, ch_y, cor in zip(X, Y, chs_x, chs_y, colors):
+        plt.scatter(x, y, color=cor)
+        plt.scatter(ch_x, ch_y, color=cor, marker='^', label=colors)
+    nome_grafico = "clusters_round_"+str(Round)+".png"
+    plt.savefig("graficos/"+nome_grafico, format='png')
+    plt.clf()

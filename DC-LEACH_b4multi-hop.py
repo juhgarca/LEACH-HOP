@@ -1,9 +1,8 @@
 from config import *
 from energySource import prediction, harvest
-from utils import generateNodes, gastoTx, gastoRx, gastoAgg, checaBateria
+from utils import generateNodes, gastoTx, gastoRx, gastoAgg, checaBateria, grafico_clusters
 import numpy as np
 import math
-import matplotlib.pyplot as plt
 
 def calculaOCHP(ener_r_har):
 
@@ -179,25 +178,8 @@ while Round <= 100:  # <------------------------- Início da Simulação
         checaBateria(nodes)
         checaBateria(CH)
         
-        #Gráfico dos clusters
-        chs_x, chs_y, X, Y = [], [], [], []
-        colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'orange', 'purple', 'olive', 'gray', 'pink', 'black', 'yellow', 'paleturquoise', 'chocolate', 'lightgreen']
-        for ch in CH:
-            x, y = [], []
-            chs_x.append(ch[2])
-            chs_y.append(ch[3])
-            for node in ch[11]:
-                x.append(node[1])
-                y.append(node[2])
-            X.append(x)
-            Y.append(y)
-             
-        for x, y, ch_x, ch_y, cor in zip(X, Y, chs_x, chs_y, colors):
-            plt.scatter(x, y, color=cor)
-            plt.scatter(ch_x, ch_y, color=cor, marker='^', label=colors)
-        nome_grafico = "clusters_round_"+str(Round)+".png"
-        plt.savefig("graficos/"+nome_grafico, format='png')
-        plt.clf()
+        #Gerar gráfico dos clusters
+        grafico_clusters(CH, Round)
 
         # CHs reduzem o alcance do radio e enviam tabela TDMA
         for ch in CH:
