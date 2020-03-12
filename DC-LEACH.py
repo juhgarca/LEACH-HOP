@@ -172,7 +172,7 @@ while Round <= 100:  # <------------------------- Início da Simulação
             n[1] = gastoTx(n[1], n[4], tamPacoteConfig)
             for ch in CH:
                 if n[11] == ch[0]:
-                    ch[11].append( [n[0], n[2], n[3]])  # <------ Guarda id e posição dos nós
+                    ch[11].append([n[0], n[2], n[3], []])  # <------ Guarda id e posição dos nós e uma lista pra guardar distancia/setor
                     ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
         # Configurações do Intra-cluster
