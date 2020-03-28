@@ -77,7 +77,7 @@ nodes = generateNodes()
 arquivo_setup = open('log_setup_phase.txt', 'w')
 arquivo_transm = open('log_dt_phase', 'w')
 arquivo_batt = open('bateria.csv', 'w')
-arquivo_log = open('log.txt', 'w')
+log = open('log.txt', 'w')
 
 arquivo_batt.write("CONSUMO ")
 for n in nodes:
@@ -172,12 +172,14 @@ while Round <= 1:  # <------------------------- Início da Simulação
             n[1] = gastoTx(n[1], n[4], tamPacoteConfig)
             for ch in CH:
                 if n[11] == ch[0]:
-                    ch[11].append([ n[0], n[2], n[3], distancia(ch[2], ch[3], n[2], n[3]) ])  # <------ Guarda id, posição dos nós e distancia ate o CH
+                    d = distancia(ch[2], ch[3], n[2], n[3])
+                    ch[11].append([ n[0], d, 0 ])  # <------ Guarda id, distancia ate o CH e setor
                     ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
         for ch in CH:
-            setorizacao(ch[11], qtd_setores)
-            arquivo_log.write(str(ch[0]) + ":" + str(ch[11]) + "\n\n")
+            log.write("CH " + str(ch[0]) + "\n")
+            setorizacao(ch[11], qtd_setores, log)
+            log.write("   NCHs (" + str(len(ch[11])) + "): " + str(ch[11]) + "\n\n")
             
 
         # Configurações do Intra-cluster

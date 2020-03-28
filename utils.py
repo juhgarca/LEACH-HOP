@@ -174,21 +174,27 @@ def definir_setores(area_cluster, qtd_setores, closest_node):
    return setores
 
 
-def setorizacao(cluster, qtd_setores):
+def setorizacao(cluster, qtd_setores, log):
    
-   closest_node = 100   # trocar por valor mais genérico !!!!
-   farthest_node = 0
+   closest_node_dist = 100   # trocar por valor mais genérico !!!!
+   closest_node_id = 0
+   farthest_node_dist = 0
+   farthest_node_id = 0
    for nch in cluster:
-      if nch[3] <= closest_node:
-         closest_node = nch[3]
-      if nch[3] >= farthest_node:
-         farthest_node = nch[3]
-   area_cluster = farthest_node - closest_node
-   setores = definir_setores(area_cluster, qtd_setores, closest_node)
+      if nch[1] <= closest_node_dist:
+         closest_node_dist = nch[1]
+         closest_node_id = nch[0]
+      if nch[1] >= farthest_node_dist:
+         farthest_node_dist = nch[1]
+         farthest_node_id = nch[0]
+   area_cluster = farthest_node_dist - closest_node_dist
+   setores = definir_setores(area_cluster, qtd_setores, closest_node_dist)
+   
+   log.write("   Closest node: " + str(closest_node_id) + " ("+ str(closest_node_dist)+")\n   Farthest node: " + str(farthest_node_id) + " ("+ str(farthest_node_dist)+")\n   Setores: "+ str(setores)+ "\n")
 
    for nch in cluster:
       i = 1
       for setor in setores:
-         if nch[3] >= setor[0] and nch[3] <= setor[1]:
-            nch[3] = i
+         if nch[1] >= setor[0] and nch[1] <= setor[1]:
+            nch[2] = i
          i += 1
