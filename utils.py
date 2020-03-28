@@ -177,18 +177,18 @@ def definir_setores(area_cluster, qtd_setores, closest_node):
 def setorizacao(cluster, qtd_setores):
    
    closest_node = 100   # trocar por valor mais genérico !!!!
-   farthers_node = 0
+   farthest_node = 0
    for nch in cluster:
       if nch[3] <= closest_node:
          closest_node = nch[3]
       if nch[3] >= farthest_node:
          farthest_node = nch[3]
-   area_cluster = farthers_node - closest_node
+   area_cluster = farthest_node - closest_node
    setores = definir_setores(area_cluster, qtd_setores, closest_node)
 
    for nch in cluster:
       i = 1
       for setor in setores:
-         if nch[3] >= setor[1] and nch[3] <= setor[2]:
+         if nch[3] >= setor[0] and nch[3] <= setor[1]:
             nch[3] = i
          i += 1

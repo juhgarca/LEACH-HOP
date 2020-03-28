@@ -83,7 +83,7 @@ arquivo_batt.write("CONSUMO ")
 for n in nodes:
     arquivo_batt.write(str(n[0])+" ")
 
-while Round <= 100:  # <------------------------- Início da Simulação
+while Round <= 1:  # <------------------------- Início da Simulação
 
     CH = []
     sleep_nodes = []
@@ -130,7 +130,6 @@ while Round <= 100:  # <------------------------- Início da Simulação
             if n[2] >= ener_ch_round:
                 CH.append(n)
                 nodes.remove(n)
-                print(n[0], " SOU CH")
             else:
                 n[6] = 0
                 print(n[0], "recharging...")
@@ -149,7 +148,6 @@ while Round <= 100:  # <------------------------- Início da Simulação
                 sleep_nodes.append(n)
                 nodes.remove(n)
 
-        print("CHs se anunciam")
         # TRANSMISSÃO CH: Envio do Broadcast
         for ch in CH:   # <------------ Envio de cada CH
             ch[1] = gastoTx(ch[1], ch[4], tamPacoteConfig)
@@ -174,12 +172,12 @@ while Round <= 100:  # <------------------------- Início da Simulação
             n[1] = gastoTx(n[1], n[4], tamPacoteConfig)
             for ch in CH:
                 if n[11] == ch[0]:
-                    ch[11].append([n[0], n[2], n[3], []])  # <------ Guarda id e posição dos nós e uma lista pra guardar distancia/setor
+                    ch[11].append([ n[0], n[2], n[3], distancia(ch[2], ch[3], n[2], n[3]) ])  # <------ Guarda id, posição dos nós e distancia ate o CH
                     ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
-            for ch in CH:
-                setorizacao(ch, qtd_setores)
-                arquivo_log.write(str(ch[0]) + ":" + str(ch[11]) + "\n\n")
+        for ch in CH:
+            setorizacao(ch[11], qtd_setores)
+            arquivo_log.write(str(ch[0]) + ":" + str(ch[11]) + "\n\n")
             
 
         # Configurações do Intra-cluster
