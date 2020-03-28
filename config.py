@@ -60,6 +60,8 @@ horizon = 10   # horizonte de predição (rounds)
 payload = 2000
 area = 100
 
+qtd_setores = 2
+
 BS = [0, area+25.0, area/2, 0.0, 0]
 distMax = distancia(0,0, area,area)
 

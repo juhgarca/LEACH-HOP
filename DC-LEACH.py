@@ -1,8 +1,9 @@
-from config import *
-from energySource import prediction, harvest
-from utils import generateNodes, gastoTx, gastoRx, gastoAgg, checaBateria, grafico_clusters
 import numpy as np
 import math
+from config import *
+from energySource import prediction, harvest
+from utils import generateNodes, gastoTx, gastoRx, gastoAgg, checaBateria, grafico_clusters, setorizacao
+
 
 def calculaOCHP(ener_r_har):
 
@@ -76,6 +77,7 @@ nodes = generateNodes()
 arquivo_setup = open('log_setup_phase.txt', 'w')
 arquivo_transm = open('log_dt_phase', 'w')
 arquivo_batt = open('bateria.csv', 'w')
+arquivo_log = open('log.txt', 'w')
 
 arquivo_batt.write("CONSUMO ")
 for n in nodes:
@@ -175,8 +177,13 @@ while Round <= 100:  # <------------------------- Início da Simulação
                     ch[11].append([n[0], n[2], n[3], []])  # <------ Guarda id e posição dos nós e uma lista pra guardar distancia/setor
                     ch[1] = gastoRx(ch[1], tamPacoteConfig)
 
+            for ch in CH:
+                setorizacao(ch, qtd_setores)
+                arquivo_log.write(str(ch[0]) + ":" + str(ch[11]) + "\n\n")
+            
+
         # Configurações do Intra-cluster
-        
+        ## To-Do ##
 
         checaBateria(nodes)
         checaBateria(CH)
